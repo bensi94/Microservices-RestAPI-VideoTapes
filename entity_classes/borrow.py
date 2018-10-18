@@ -7,7 +7,7 @@ class Borrow:
         self.tape_id = int(tape_id)
         self.borrow_date = datetime.strptime(borrow_date, '%Y-%m-%d')
 
-        if return_date == 'null':
+        if return_date == None:
             self.return_date = None
         else:
             self.return_date = datetime.strptime(return_date, '%Y-%m-%d')

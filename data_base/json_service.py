@@ -52,10 +52,10 @@ class Json_service:
             last_name = tape['director_last_name']
             type = tape['type']
             release_date = tape['release_date']
-            eidr = tape['edir']
+            eidr = tape['eidr']
             tape = Tape(tape_id, title, first_name, last_name, type, release_date, eidr)
             self.tape_list.append(tape)
-            print(tape)
+            
                 
 
     

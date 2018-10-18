@@ -47,11 +47,4 @@ class Tables:
         print("Here")
         json_service = Json_service()
         json_service.read_json()
-        
-        # We only want to populate the tables if they are empty
-        if (select([func.count()]).select_from(self.users_table) == 0 and
-            select([func.count()]).select_from(self.tapes_table) == 0 and
-            select([func.count()]).select_from(self.borrow_table) == 0):
-            json_service = Json_service()
-            json_service.read_json()
-            
+  
