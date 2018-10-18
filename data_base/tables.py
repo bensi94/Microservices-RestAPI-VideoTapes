@@ -1,13 +1,17 @@
-from sqlalchemy import  select, func, Table, Column, String, MetaData, Integer, Date, ForeignKey, create_engine
+from sqlalchemy import  select, func, Table, Column, String, MetaData, Integer, Date, ForeignKey, insert
 from data_base.json_service import Json_service
+from data_base.database_utils import Database_utils
 
 class Tables:
-    def __init__(self, connection_string):
-        self.db = create_engine(connection_string)
+    def __init__(self, engine, connection):
+        self.db = engine 
         self.meta = MetaData(self.db)
-        self.users_table = ()
-        self.tapes_table = ()
-        self.borrow_table = ()
+        self.users_table = None
+        self.tapes_table = None
+        self.borrow_table = None
+        self.connection = connection
+        self.utils = Database_utils(connection)
+        
             
     def create_tables(self):
                 ## USERS table schema
@@ -44,7 +48,46 @@ class Tables:
         self.borrow_table = borrow_table
 
     def populate_tables(self):
-        print("Here")
-        json_service = Json_service()
-        json_service.read_json()
+        
+        # Data base is only populated if it's empty before
+        if (self.utils.count_rows(self.users_table) == 0 and 
+            self.utils.count_rows(self.tapes_table) == 0 and 
+            self.utils.count_rows(self.borrow_table) == 0):
+
+            json_service = Json_service()
+            json_service.read_json()
+            
+            for user in json_service.get_users():
+                insert_query = insert(self.users_table).values(
+                    id=user.id,
+                    name=user.name,
+                    email=user.email,
+                    phone=user.phone,
+                    address=user.address
+                )
+                self.connection.execute(insert_query)
+            
+            for tape in json_service.get_tape_list():
+                insert_query = insert(self.tapes_table).values(
+                    id=tape.id,
+                    title=tape.title,
+                    director=tape.director,
+                    type=tape.type,
+                    release_date=tape.release_date,
+                    eidr=tape.eidr
+                )
+                self.connection.execute(insert_query)
+
+            for borrow in json_service.get_borrow_list():
+                insert_query = insert(self.borrow_table).values(
+                    id=borrow.id,
+                    user_id=borrow.user_id,
+                    tape_id=borrow.id,
+                    borrow_date=borrow.borrow_date,
+                    return_date=borrow.return_date
+                )
+                self.connection.execute(insert_query)
+
+
+
   
