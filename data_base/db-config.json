@@ -1,0 +1,6 @@
+{
+    "POSTGRES_USER": "aslakur",
+    "POSTGRES_PASSWORD": "1234",
+    "POSTGRES_DB": "video_tapes",
+    "POSTGRES_HOST": "db"
+}
