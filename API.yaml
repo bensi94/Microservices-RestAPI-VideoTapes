@@ -1,0 +1,742 @@
+swagger: "2.0"
+info:
+  version: 0.0.0
+  title: "P01"
+  description: "Videotapes Galore - Áslákurs videotape collection"
+  contact:
+    name:  "Benedikt" 
+host: "127.0.0.1:8080"
+basePath: "/api/v1"
+tags: 
+- name: "User"
+  description: "users of the system, Áslákurs friend (or himself)"
+- name: "Tape"
+  description: "Videotape"
+- name: "Reviews"
+  description: "Reviews about tapes"
+- name: "Recommendation"
+  description: "Tape recommendation"
+definitions:
+  User:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int32"
+      name:
+        type: "string"
+      address:
+        type: "string"
+      email:
+        type: "string"
+      phoneNumb:
+        type: "string"
+  Tape:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int32"
+      title:
+        type: "string"
+      director:
+        type: "string"
+      type:
+        type: "string"
+      releaseDate:
+        type: "string"
+        format: "date-time"
+  # The idea with borrow is have both id as a relation
+  # Then connection between both would be implemented in code
+  Borrow:
+    type: "object"
+    properties:
+      user_id:
+        type: "integer"
+        format: "int32"
+      tape_id:
+        type: "integer"
+        format: "int32"
+      borrowDate:
+        type: "string"
+        format: "date-time"
+  Review:
+    type: "object"
+    properties:
+      user_id:
+        type: "integer"
+        format: "int32"
+      tape_id:
+        type: "integer"
+        format: "int32"
+      rate:
+        type: "integer"
+        format: "int32"
+        minimum: 1
+        maximum: 5
+        
+paths:
+  /users:
+    post:
+      tags: 
+      - "User"
+      summary: "Create new users"
+      operationId: "createusers"
+      produces: 
+      - "application/json"
+      parameters: 
+      - in: "body"
+        name: "body"
+        description: "The added users"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/User"
+            
+    # Used both for tape on loan at date and on loan for more than month
+    # Body parameters determines which
+    get:
+      tags:
+      - "User"
+      summary: "Returns all users that have tapes on loan"
+      operationId: "getuserssThatHaveTape"
+      produces:
+      - "application/json"
+      parameters: 
+      - in: "body"
+        name: "body"
+        description: "In this body parameter should be both date information and if it should be for a month or not"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/User"
+            
+  /users/{user_id}:
+    get:
+      tags: 
+      - "User"
+      summary: "Get users by id"
+      operationId: "getusersById"
+      produces: 
+      - "application/json"
+      parameters: 
+      - name: "user_id"
+        in: "path"
+        description: "The id of the users"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/User"
+        404:
+          description: "user not found"
+    put:
+      tags: 
+      - "User"
+      summary: "Update users by id"
+      operationId: "updateusersById"
+      produces: 
+      - "application/json"
+      parameters: 
+      - name: "user_id"
+        in: "path"
+        description: "The id of the users"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/User"
+        404:
+          description: "user not found"
+    delete:
+      tags: 
+      - "User"
+      summary: "Delete users by id"
+      operationId: "deleteuser_id"
+      produces: 
+      - "application/json"
+      parameters: 
+      - name: "user_id"
+        in: "path"
+        description: "The id of the users"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/User"
+        404:
+          description: "user not found"
+  /tapes:
+    post:
+      tags: 
+      - "Tape"
+      summary: "Create new tapes"
+      operationId: "createTape"
+      produces: 
+      - "application/json"
+      parameters: 
+      - in: "body"
+        name: "body"
+        description: "The added tapes"
+        required: true
+        schema:
+          $ref: "#/definitions/Tape"
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/Tape"
+            
+    get:
+      tags: 
+      - "Tape"
+      summary: "Get tapes that are out on loan by id"
+      operationId: "getTapes"
+      produces: 
+      - "application/json"
+      parameters: 
+      - in: "body"
+        name: "body"
+        description: "The query date"
+        required: true
+        schema:
+          $ref: "#/definitions/Tape"
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/Tape"
+        404:
+          description: "Tape not found"
+
+            
+  /tapes/{tape_id}:
+    get:
+      tags: 
+      - "Tape"
+      summary: "Get tapes by id"
+      operationId: "getTapeById"
+      produces: 
+      - "application/json"
+      parameters: 
+      - name: "tape_id"
+        in: "path"
+        description: "The id of the tape"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/Tape"
+        404:
+          description: "Tape not found"
+    put:
+      tags: 
+      - "Tape"
+      summary: "Update tapes by id"
+      operationId: "updateTapeById"
+      produces: 
+      - "application/json"
+      parameters: 
+      - name: "tape_id"
+        in: "path"
+        description: "The id of the tape"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/Tape"
+        404:
+          description: "Tape not found"
+    delete:
+      tags: 
+      - "Tape"
+      summary: "Delete tapes by id"
+      operationId: "deletetape_id"
+      produces: 
+      - "application/json"
+      parameters: 
+      - name: "tape_id"
+        in: "path"
+        description: "The id of the tape"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/Tape"
+        404:
+          description: "Tape not found"
+          
+  /users/{user_id}/tapes/{tape_id}:
+    post:
+      tags: 
+      - "Tape"
+      summary: "Borrow a tapes"
+      operationId: "borrowTape"
+      produces: 
+      - "application/json"
+      parameters: 
+      - name: "user_id"
+        in: "path"
+        description: "The id of the user that should borrow the tape"
+        required: true
+        type: "integer"
+        format: "int32"
+      - name: "tape_id"
+        in: "path"
+        description: "The id of the tape that should be borrowed"
+        required: true
+        type: "integer"
+        format: "int32"
+      - in: "body"
+        name: "body"
+        description: "The date of borrow"
+        required: true
+        schema:
+          $ref: "#/definitions/Borrow"
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/Borrow"
+        404:
+          description: "user or tape not found"
+    get:
+      tags: 
+      - "Tape"
+      summary: "Get the date of the  borrowed tapes"
+      operationId: "getBorrow"
+      produces: 
+      - "application/json"
+      parameters: 
+      - name: "user_id"
+        in: "path"
+        description: "The id of the user that should borrow the tape"
+        required: true
+        type: "integer"
+        format: "int32"
+      - name: "tape_id"
+        in: "path"
+        description: "The id of the tape that should be borrowed"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/Borrow"
+        404:
+          description: "user or tape not found"
+    put:
+      tags: 
+      - "Tape"
+      summary: "Update the date of the  borrowed tapes"
+      operationId: "updateBorrow"
+      produces: 
+      - "application/json"
+      parameters: 
+      - name: "user_id"
+        in: "path"
+        description: "The id of the user that should borrow the tape"
+        required: true
+        type: "integer"
+        format: "int32"
+      - name: "tape_id"
+        in: "path"
+        description: "The id of the tape that should be borrowed"
+        required: true
+        type: "integer"
+        format: "int32"
+      - in: "body"
+        name: "body"
+        description: "The date of borrow"
+        required: true
+        schema:
+          $ref: "#/definitions/Borrow"
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/Borrow"
+        404:
+          description: "user or tape not found"
+    delete:
+      tags: 
+      - "Tape"
+      summary: "Delete the borrowed connection"
+      operationId: "deleteBorrow"
+      produces: 
+      - "application/json"
+      parameters: 
+      - name: "user_id"
+        in: "path"
+        description: "The id of the user that should borrow the tape"
+        required: true
+        type: "integer"
+        format: "int32"
+      - name: "tape_id"
+        in: "path"
+        description: "The id of the tape that should be borrowed"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/Borrow"
+        404:
+          description: "user or tape not found"
+   
+  /users/{user_id}/tapes:
+    get:
+      tags:
+      - "Tape"
+      summary: "Gets tapes based on ratings"
+      operationId: "getTapeOnRating"
+      produces: 
+      - "application/json"
+      parameters: 
+      - name: "user_id"
+        in: "path"
+        description: "The id of the user that should rate the tape"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/Tape"
+        404:
+          description: "user not found"
+  
+  /users/{user_id}/reviews:
+    get:
+      tags: 
+      - "Reviews"
+      summary: "Get reviews by a given user"
+      operationId: "getUserReviews"
+      produces: 
+      - "application/json"
+      parameters: 
+      - name: "user_id"
+        in: "path"
+        description: "The id of the user"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/Review"
+        404:
+          description: "user not found"
+          
+  /users/{user_id}/reviews/{tape_id}:
+      post:
+        tags: 
+        - "Reviews"
+        summary: "Review a tape"
+        operationId: "reviewTape"
+        produces: 
+        - "application/json"
+        parameters: 
+        - name: "user_id"
+          in: "path"
+          description: "The id of the user that should review the tape"
+          required: true
+          type: "integer"
+          format: "int32"
+        - name: "tape_id"
+          in: "path"
+          description: "The id of the tape that should be reviewed"
+          required: true
+          type: "integer"
+          format: "int32"
+        - in: "body"
+          name: "body"
+          description: "The rating"
+          required: true
+          schema:
+            $ref: "#/definitions/Review"
+        responses:
+          200:
+            description: OK
+            schema:
+              $ref: "#/definitions/Review"
+          404:
+            description: "user or tape not found"
+      get:
+        tags: 
+        - "Reviews"
+        summary: "Get the users rateing of the tape"
+        operationId: "getRating"
+        produces: 
+        - "application/json"
+        parameters: 
+        - name: "user_id"
+          in: "path"
+          description: "The id of the user that should have rated the tape"
+          required: true
+          type: "integer"
+          format: "int32"
+        - name: "tape_id"
+          in: "path"
+          description: "The id of the tape that should been rated"
+          required: true
+          type: "integer"
+          format: "int32"
+        responses:
+          200:
+            description: OK
+            schema:
+              $ref: "#/definitions/Review"
+          404:
+            description: "user or tape not found"
+      put:
+        tags: 
+        - "Reviews"
+        summary: "Update the date of the  borrowed tapes"
+        operationId: "updateRating"
+        produces: 
+        - "application/json"
+        parameters: 
+        - name: "user_id"
+          in: "path"
+          description: "The id of the user that should rate the tape"
+          required: true
+          type: "integer"
+          format: "int32"
+        - name: "tape_id"
+          in: "path"
+          description: "The id of the tape that should been rated"
+          required: true
+          type: "integer"
+          format: "int32"
+        - in: "body"
+          name: "body"
+          description: "The rating"
+          required: true
+          schema:
+            $ref: "#/definitions/Review"
+        responses:
+          200:
+            description: OK
+            schema:
+              $ref: "#/definitions/Review"
+          404:
+            description: "user or tape not found"
+      delete:
+        tags: 
+        - "Reviews"
+        summary: "Delete the review"
+        operationId: "deleteReview"
+        produces: 
+        - "application/json"
+        parameters: 
+        - name: "user_id"
+          in: "path"
+          description: "The id of the user that should have rated the tape"
+          required: true
+          type: "integer"
+          format: "int32"
+        - name: "tape_id"
+          in: "path"
+          description: "The id of the tape that should been rated"
+          required: true
+          type: "integer"
+          format: "int32"
+        responses:
+          200:
+            description: OK
+            schema:
+              $ref: "#/definitions/Review"
+          404:
+            description: "user or tape not found"
+      
+  #TODO: Check if correct implementation...
+  /users/{user_id}/recommendation:
+    get:
+      tags:
+      - "Recommendation"
+      summary: "Gets recommendation for tapes for a user by user id"
+      operationId: "getRecommendation"
+      produces: 
+      - "application/json"
+      parameters: 
+      - name: "user_id"
+        in: "path"
+        description: "The id of the user that should get the recommendation"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/Tape"
+        404:
+          description: "user not found"
+  
+  /tapes/reviews:
+    get:
+      tags: 
+      - "Reviews"
+      summary: "Get all reviews for tapes"
+      operationId: "getAllReviews"
+      produces: 
+      - "application/json"
+      parameters: 
+      - in: "body"
+        name: "body"
+        description: "The query date"
+        required: true
+        schema:
+          $ref: "#/definitions/Review"
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/Review"
+        404:
+          description: "Tapes not found"
+  
+  /tapes/{tape_id}/reviews:
+    get:
+      tags: 
+      - "Reviews"
+      summary: "Get all reviews for a given tape"
+      operationId: "getAllReviewsForTape"
+      produces: 
+      - "application/json"
+      parameters: 
+      - name: "tape_id"
+        in: "path"
+        description: "The id of the tape"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/Review"
+        404:
+          description: "Tape not found"
+          
+  /tapes/{tape_id}/reviews/{user_id}:
+    get:
+        tags: 
+        - "Reviews"
+        summary: "Get the users rateing of the tape"
+        operationId: "getRatingByUser"
+        produces: 
+        - "application/json"
+        parameters: 
+        - name: "user_id"
+          in: "path"
+          description: "The id of the user that should have rated the tape"
+          required: true
+          type: "integer"
+          format: "int32"
+        - name: "tape_id"
+          in: "path"
+          description: "The id of the tape that should been rated"
+          required: true
+          type: "integer"
+          format: "int32"
+        responses:
+          200:
+            description: OK
+            schema:
+              $ref: "#/definitions/Review"
+          404:
+            description: "user or tape not found"
+    put:
+        tags: 
+        - "Reviews"
+        summary: "Update the date of the  borrowed tapes"
+        operationId: "updateRatingByUser"
+        produces: 
+        - "application/json"
+        parameters: 
+        - name: "user_id"
+          in: "path"
+          description: "The id of the user that should rate the tape"
+          required: true
+          type: "integer"
+          format: "int32"
+        - name: "tape_id"
+          in: "path"
+          description: "The id of the tape that should been rated"
+          required: true
+          type: "integer"
+          format: "int32"
+        - in: "body"
+          name: "body"
+          description: "The rating"
+          required: true
+          schema:
+            $ref: "#/definitions/Review"
+        responses:
+          200:
+            description: OK
+            schema:
+              $ref: "#/definitions/Review"
+          404:
+            description: "user or tape not found"
+    delete:
+        tags: 
+        - "Reviews"
+        summary: "Delete the review"
+        operationId: "deleteReviewByUser"
+        produces: 
+        - "application/json"
+        parameters: 
+        - name: "user_id"
+          in: "path"
+          description: "The id of the user that should have rated the tape"
+          required: true
+          type: "integer"
+          format: "int32"
+        - name: "tape_id"
+          in: "path"
+          description: "The id of the tape that should been rated"
+          required: true
+          type: "integer"
+          format: "int32"
+        responses:
+          200:
+            description: OK
+            schema:
+              $ref: "#/definitions/Review"
+          404:
+            description: "user or tape not found"
