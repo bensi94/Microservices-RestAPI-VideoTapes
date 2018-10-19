@@ -1,6 +1,6 @@
 from sqlalchemy import  select, func, Table, Column, String, MetaData, Integer, Date, ForeignKey, insert
-from data_base.json_service import Json_service
-from data_base.database_utils import Database_utils
+from database_service.json_service import Json_service
+from database_service.database_utils import Database_utils
 
 class Tables:
     def __init__(self, engine, connection):

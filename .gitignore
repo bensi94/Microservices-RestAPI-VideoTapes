@@ -1,2 +1,6 @@
 .vscode
 postgres-data/postgres
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class

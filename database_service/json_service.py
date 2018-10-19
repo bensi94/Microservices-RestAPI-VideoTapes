@@ -55,10 +55,7 @@ class Json_service:
             eidr = tape['eidr']
             tape = Tape(tape_id, title, first_name, last_name, type, release_date, eidr)
             self.tape_list.append(tape)
-            
-                
-
-    
+             
     def get_users(self):
         return self.user_list
 

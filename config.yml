@@ -1,0 +1,5 @@
+AMQP_URI: pyamqp://${RABBIT_USER:guest}:${RABBIT_PASSWORD:guest}@${RABBIT_HOST:localhost}:${RABBIT_PORT:5672}/
+LOGSTASH:
+    HOST: localhost
+    PORT: 5959
+    LOG_LEVEL: INFO
