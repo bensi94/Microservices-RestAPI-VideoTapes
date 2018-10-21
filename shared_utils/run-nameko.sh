@@ -21,4 +21,4 @@ done
 
 # Run Service
 
-nameko run --config config.yml database_service.database_nameko_api --backdoor 3000
+nameko run --config config.yml $SERVICE_STRING

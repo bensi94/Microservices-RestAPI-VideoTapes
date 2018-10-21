@@ -2,9 +2,13 @@ from sqlalchemy import create_engine
 import json
 
 from database_service.tables import Tables
+from shared_utils.logger import _log
 
 class Database_service:
     def __init__(self):
+        _log.info('Connecting to database')
+
+        # Get the config for the database
         with open('database_service/db-config.json', 'r') as file:
             config = json.load(file)
 
@@ -18,10 +22,12 @@ class Database_service:
         self.db = create_engine(connection_string)
         self.conn = self.db.connect()
 
-        print("Initing database class")
+        
 
 
     def init_database(self):
+        _log.info('Initializing to database')
+
         tables = Tables(self.db, self.conn)
 
         # Tables created here if they don't exist
@@ -29,8 +35,6 @@ class Database_service:
 
         # Tables populated only if they are empty
         tables.populate_tables()
-        
-        print("Initing database function")
 
 
 

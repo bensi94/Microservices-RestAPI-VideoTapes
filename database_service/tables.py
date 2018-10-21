@@ -1,6 +1,7 @@
 from sqlalchemy import  select, func, Table, Column, String, MetaData, Integer, Date, ForeignKey, insert
 from database_service.json_service import Json_service
 from database_service.database_utils import Database_utils
+from shared_utils.logger import _log
 
 class Tables:
     def __init__(self, engine, connection):
@@ -14,7 +15,9 @@ class Tables:
         
             
     def create_tables(self):
-                ## USERS table schema
+        _log.info('Creating tables')
+
+        ## USERS table schema
         users_table = Table('users', self.meta,
                             Column('id', Integer, primary_key=True),
                             Column('name', String, nullable=False),
@@ -53,7 +56,8 @@ class Tables:
         if (self.utils.count_rows(self.users_table) == 0 and 
             self.utils.count_rows(self.tapes_table) == 0 and 
             self.utils.count_rows(self.borrow_table) == 0):
-
+        
+            _log.info('Populating tables')
             json_service = Json_service()
             json_service.read_json()
             
