@@ -23,3 +23,7 @@ class Tape_Nameko_api:
     @rpc
     def delete_tape(self, tape_id):
         return self.tape_service.delete_tape(tape_id)
+
+    @rpc
+    def update_tape(self, tape_id, tape):
+        return self.tape_service.update_tape(tape_id, tape)

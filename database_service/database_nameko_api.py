@@ -54,3 +54,6 @@ class Database_Nameko_api:
     def delete_tape(self, tape_id):
         return self.db_tape_service.delete_tape(tape_id)
 
+    @rpc 
+    def update_tape(self, tape_id, tape):
+        return self.db_tape_service.update_tape(tape_id, tape)

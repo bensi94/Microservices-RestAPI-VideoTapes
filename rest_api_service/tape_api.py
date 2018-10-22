@@ -44,5 +44,15 @@ class TapeAPI(MethodView):
 
     # Updates tape by ID
     def put(self, tape_id):
-        # TO DO: update a single tape
-        pass
+        tape = {
+            "title": request.args.get('title'),
+            "director": request.args.get('director'),
+            "type": request.args.get('type'),
+            "release_date": request.args.get('release_date'),
+            "eidr": request.args.get('eidr')
+        }
+
+        with ClusterRpcProxy(CONFIG) as rpc:
+            response = rpc.tape_service.update_tape(tape_id, tape)
+            return(response['msg'], response['code'])
+        
