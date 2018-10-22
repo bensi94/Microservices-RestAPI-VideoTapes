@@ -92,7 +92,7 @@ class Tables:
                 )
                 self.connection.execute(insert_query)
 
-    def get_user_table(self):
+    def get_users_table(self):
         return self.users_table
     
     def get_tapes_table(self):

@@ -1,12 +1,16 @@
 from nameko.rpc import rpc
 from shared_utils.logger import EntrypointLogger, _log
+from user_service.user_service_file import User_service
 
 class User_Nameko_api:
 
     name = 'user_service'
     entrypoint_logger = EntrypointLogger()
+    user_service = User_service()
 
     @rpc
-    def on_hello(self):
-        _log.info('Hello world log!')
-        return('Hello World return!')
+    def get_users(self):
+        return self.user_service.get_users()
+    @rpc
+    def get_user(self, user_id):
+        return self.user_service.get_user(user_id)
