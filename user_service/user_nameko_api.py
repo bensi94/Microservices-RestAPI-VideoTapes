@@ -14,3 +14,7 @@ class User_Nameko_api:
     @rpc
     def get_user(self, user_id):
         return self.user_service.get_user(user_id)
+
+    @rpc
+    def add_user(self, user):
+        return self.user_service.add_user(user)

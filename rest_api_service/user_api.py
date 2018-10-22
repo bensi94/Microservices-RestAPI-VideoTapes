@@ -1,7 +1,7 @@
 from flask.views import MethodView
 from nameko.standalone.rpc import ClusterRpcProxy
 from shared_utils.config import CONFIG
-from flask import Response
+from flask import Response, request
 import json
 
 class UserAPI(MethodView):
@@ -24,9 +24,22 @@ class UserAPI(MethodView):
         
     # Creates new user
     def post(self):
-        # TO DO: Create user
-        pass
+        name = request.args.get('name')
 
+        if name is None:
+            return ('Name is required!', 400)
+        
+        user = {
+            'name': request.args.get('name'),
+            'email': request.args.get('email'),
+            'phone': request.args.get('phone'),
+            'address': request.args.get('address')
+        }
+
+        with ClusterRpcProxy(CONFIG) as rpc:
+            response = rpc.user_service.add_user(user)
+        
+        return(response)
     #  Deletes user by ID
     def delete(self, user_id):
         # TO DO: delete a single user
