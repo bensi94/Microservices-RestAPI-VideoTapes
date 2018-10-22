@@ -30,6 +30,10 @@ class Tape_service:
 
         return response
 
+    def delete_tape(self, tape_id):
+        with ClusterRpcProxy(CONFIG) as rpc:
+            return rpc.database_service.delete_tape(tape_id=tape_id)
+
     def validate_tape(self, tape):
         if tape['title'] is None:
             return False, 'Title is required'

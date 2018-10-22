@@ -50,3 +50,7 @@ class Database_Nameko_api:
     def add_tape(self, tape):
         return self.db_tape_service.add_tape(tape)
 
+    @rpc 
+    def delete_tape(self, tape_id):
+        return self.db_tape_service.delete_tape(tape_id)
+
