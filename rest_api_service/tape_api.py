@@ -12,10 +12,15 @@ class TapeAPI(MethodView):
         with ClusterRpcProxy(CONFIG) as rpc:
             if tape_id is None:
                 tapes = rpc.tape_service.get_tapes()
-                print(tapes)
-                return Response(json.dumps(tapes),  mimetype='application/json') 
+                if tapes is not None:
+                    return Response(json.dumps(tapes),  mimetype='application/json') 
             else:
-               return ('from else')
+                tape = rpc.tape_service.get_tape(tape_id=tape_id)
+
+                if tape is not None:
+                    return  Response(json.dumps(tape),  mimetype='application/json') 
+
+        return ('Tape not found!', 404)
             
 
     # Creates new tape
