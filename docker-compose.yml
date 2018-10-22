@@ -91,7 +91,24 @@ services:
         RABBIT_PORT: "5672"
         RABBIT_MANAGEMENT_PORT: "15672"
         SERVICE_STRING: "user_service.user_nameko_api"
-    
+
+  rest_api_service:
+    build:
+      context: ./
+      dockerfile: ./rest_api_service/Dockerfile
+    ports:
+      - 5000:80
+    depends_on:
+      - db
+      - rabbit
+
+    environment:
+      RABBIT_PASSWORD: "guest"
+      RABBIT_USER: "guest"
+      RABBIT_HOST: "rabbit"
+      RABBIT_PORT: "5672"
+      RABBIT_MANAGEMENT_PORT: "15672"
+  
     
     
 
