@@ -15,6 +15,8 @@ services:
     image: rabbitmq:3.6-management
     ports:
       - 15672:15672
+    logging:
+      driver: none
 
 
   database_service:
@@ -32,37 +34,35 @@ services:
         RABBIT_MANAGEMENT_PORT: "15672"
         SERVICE_STRING: "database_service.database_nameko_api"
 
-  recommendation_service:
-    build:
-      context: ./
-      dockerfile: ./recommendation_service/Dockerfile
-    depends_on:
-      - db
-      - rabbit
-    environment:
-        RABBIT_PASSWORD: "guest"
-        RABBIT_USER: "guest"
-        RABBIT_HOST: "rabbit"
-        RABBIT_PORT: "5672"
-        RABBIT_MANAGEMENT_PORT: "15672"
-        SERVICE_STRING: "recommendation_service.recommendation_nameko_api"
+  # recommendation_service:
+  #   build:
+  #     context: ./
+  #     dockerfile: ./recommendation_service/Dockerfile
+  #   depends_on:
+  #     - db
+  #     - rabbit
+  #   environment:
+  #       RABBIT_PASSWORD: "guest"
+  #       RABBIT_USER: "guest"
+  #       RABBIT_HOST: "rabbit"
+  #       RABBIT_PORT: "5672"
+  #       RABBIT_MANAGEMENT_PORT: "15672"
+  #       SERVICE_STRING: "recommendation_service.recommendation_nameko_api"
 
-  review_service:
-    build:
-      context: ./
-      dockerfile: ./review_service/Dockerfile
-    depends_on:
-      - db
-      - rabbit
-    environment:
-        RABBIT_PASSWORD: "guest"
-        RABBIT_USER: "guest"
-        RABBIT_HOST: "rabbit"
-        RABBIT_PORT: "5672"
-        RABBIT_MANAGEMENT_PORT: "15672"
-        SERVICE_STRING: "review_service.review_nameko_api"
-    logging:
-      driver: none
+  # review_service:
+  #   build:
+  #     context: ./
+  #     dockerfile: ./review_service/Dockerfile
+  #   depends_on:
+  #     - db
+  #     - rabbit
+  #   environment:
+  #       RABBIT_PASSWORD: "guest"
+  #       RABBIT_USER: "guest"
+  #       RABBIT_HOST: "rabbit"
+  #       RABBIT_PORT: "5672"
+  #       RABBIT_MANAGEMENT_PORT: "15672"
+  #       SERVICE_STRING: "review_service.review_nameko_api"
 
   tape_service:
     build:

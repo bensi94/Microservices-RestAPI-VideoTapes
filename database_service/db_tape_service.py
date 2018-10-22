@@ -20,5 +20,18 @@ class Database_tape_service:
 
         return tapes
 
+    def get_tape(self, tape_id):
+        tape_table = self.tables.get_tapes_table()
+        select_query = select([tape_table]).where(tape_table.c.id == tape_id)
+        result = self.connection.execute(select_query)
+        result = result.fetchone()
+
+        if result is None:
+            return None
+        else:
+            tape = Tape(input_tuple=result)
+            return tape.return_as_dict()
+
+
 
 

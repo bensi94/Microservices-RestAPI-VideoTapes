@@ -28,10 +28,14 @@ class Database_Nameko_api:
     db_user_service = Database_user_service(connection, tables)
 
     @rpc
+    def get_users(self):
+        return self.db_user_service.get_users()
+
+    @rpc
     def get_tapes(self):
         return self.db_tape_service.get_tapes()
     
     @rpc
-    def get_users(self):
-        return self.db_user_service.get_users()
+    def get_tape(self, tape_id):
+        return self.db_tape_service.get_tape(tape_id)
 
