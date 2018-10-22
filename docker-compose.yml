@@ -61,6 +61,8 @@ services:
         RABBIT_PORT: "5672"
         RABBIT_MANAGEMENT_PORT: "15672"
         SERVICE_STRING: "review_service.review_nameko_api"
+    logging:
+      driver: none
 
   tape_service:
     build:

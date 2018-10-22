@@ -5,6 +5,10 @@ from database_service.tables import Tables
 from shared_utils.logger import _log
 
 class Database_service:
+
+    tables = None
+
+    # Creates connections to the database
     def __init__(self):
         _log.info('Connecting to database')
 
@@ -22,21 +26,23 @@ class Database_service:
         self.db = create_engine(connection_string)
         self.conn = self.db.connect()
 
-        
-
-
+    # Initializes tables and data in the database
     def init_database(self):
         _log.info('Initializing to database')
 
-        tables = Tables(self.db, self.conn)
+        self.tables = Tables(self.db, self.conn)
 
         # Tables created here if they don't exist
-        tables.create_tables()
+        self.tables.create_tables()
 
         # Tables populated only if they are empty
-        tables.populate_tables()
+        self.tables.populate_tables()
 
-
+    def get_connection(self):
+        return self.conn
+    
+    def get_tables(self):
+        return self.tables
 
 
 

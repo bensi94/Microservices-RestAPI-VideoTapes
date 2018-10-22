@@ -1,12 +1,13 @@
 from nameko.rpc import rpc
 from shared_utils.logger import EntrypointLogger, _log
+from tape_service.tape_service_file import Tape_service
 
 class Tape_Nameko_api:
 
     name = 'tape_service'
     entrypoint_logger = EntrypointLogger()
+    tape_service = Tape_service()
 
     @rpc
-    def on_hello(self):
-        _log.info('Hello world log!')
-        return('Hello World return!')
+    def get_tapes(self):
+        return self.tape_service.get_tapes()

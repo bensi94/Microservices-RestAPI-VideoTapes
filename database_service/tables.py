@@ -92,6 +92,15 @@ class Tables:
                 )
                 self.connection.execute(insert_query)
 
+    def get_user_table(self):
+        return self.users_table
+    
+    def get_tapes_table(self):
+        return self.tapes_table
+
+    def get_borrow_table(self):
+        return self.borrow_table
+        
 
 
   

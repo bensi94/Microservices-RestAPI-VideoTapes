@@ -1,6 +1,6 @@
 from flask.views import MethodView
 from nameko.standalone.rpc import ClusterRpcProxy
-from config import CONFIG
+from shared_utils.config import CONFIG
 
 class UserAPI(MethodView):
 

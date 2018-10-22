@@ -1,17 +1,22 @@
 from flask.views import MethodView
-
+from nameko.standalone.rpc import ClusterRpcProxy
+from shared_utils.config import CONFIG
+from flask import Response
+import json
 
 class TapeAPI(MethodView):
 
     # Returns list of tapes if tape_id is none
     # But spesific tape by id if tape is not None
     def get(self, tape_id):
-        if tape_id is None:
-            # TO DO: return list of tapes
-            pass
-        else:
-            pass
-            # TO DO: return single tape
+        with ClusterRpcProxy(CONFIG) as rpc:
+            if tape_id is None:
+                tapes = rpc.tape_service.get_tapes()
+                print(tapes)
+                return Response(json.dumps(tapes),  mimetype='application/json') 
+            else:
+               return ('from else')
+            
 
     # Creates new tape
     def post(self):
