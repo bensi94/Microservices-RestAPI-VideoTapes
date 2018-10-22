@@ -1,4 +1,4 @@
-from sqlalchemy import select, insert
+from sqlalchemy import select, insert, func
 from shared_utils.logger import _log
 from entity_classes.tape import Tape
 from database_service.database_utils import Database_utils
@@ -40,19 +40,33 @@ class Database_tape_service:
     def add_tape(self, tape):
         tape_table = self.tables.get_tapes_table()
         new_id = self.utils.get_max_id(tape_table)
-        
-        insert_query = insert(tape_table).values(
-            id=new_id,
-            title=tape['title'],
-            director=tape['director'],
-            type=tape['type'],
-            release_date=tape['release_date'],
-            eidr=tape['eidr']
-        )
 
-        self.connection.execute(insert_query)
+        # Checking if eidr exists in database
+        if int(self.connection.execute(select(
+            [func.count(tape_table.c.eidr)]).where(tape_table.c.eidr 
+            == tape['eidr'])).scalar()) > 0:
+            response = {
+                'code': 400,
+                'msg': 'Edir already exists'
+            }
 
-        return ('Tape added: title=' + tape['title'] + ' id=' + str(new_id))
+        else: 
+            insert_query = insert(tape_table).values(
+                id=new_id,
+                title=tape['title'],
+                director=tape['director'],
+                type=tape['type'],
+                release_date=tape['release_date'],
+                eidr=tape['eidr']
+            )
+
+            self.connection.execute(insert_query)
+
+            response = {
+                'code': 200,
+                'msg': 'Tape added: title=' + tape['title'] + ' id=' + str(new_id)
+            }
+        return response
 
 
 
