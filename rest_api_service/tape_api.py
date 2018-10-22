@@ -24,11 +24,6 @@ class TapeAPI(MethodView):
             
     # Creates new tape
     def post(self):
-        title = request.args.get('title')
-
-        if title is None:
-            return ('Title is required!', 400)
-
         tape = {
             "title": request.args.get('title'),
             "director": request.args.get('director'),
@@ -36,13 +31,11 @@ class TapeAPI(MethodView):
             "release_date": request.args.get('release_date'),
             "eidr": request.args.get('eidr')
         }
-
         
         with ClusterRpcProxy(CONFIG) as rpc:
-            response = rpc.tape_service.add_tape(tape)
-
-        return(response)
-
+             response = rpc.tape_service.add_tape(tape)
+             return(response['msg'], response['code'])
+             
     #  Deletes tape by ID
     def delete(self, tape_id):
         # TO DO: delete a single tape
