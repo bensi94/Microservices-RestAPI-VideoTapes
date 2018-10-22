@@ -1,7 +1,7 @@
 from flask.views import MethodView
 from nameko.standalone.rpc import ClusterRpcProxy
 from shared_utils.config import CONFIG
-from flask import Response
+from flask import Response, request
 import json
 
 class TapeAPI(MethodView):
@@ -22,11 +22,26 @@ class TapeAPI(MethodView):
 
         return ('Tape not found!', 404)
             
-
     # Creates new tape
     def post(self):
-        # TO DO: Create tape
-        pass
+        title = request.args.get('title')
+
+        if title is None:
+            return ('Title is required!', 400)
+
+        tape = {
+            "title": request.args.get('title'),
+            "director": request.args.get('director'),
+            "type": request.args.get('type'),
+            "release_date": request.args.get('release_date'),
+            "eidr": request.args.get('eidr')
+        }
+
+        
+        with ClusterRpcProxy(CONFIG) as rpc:
+            response = rpc.tape_service.add_tape(tape)
+
+        return(response)
 
     #  Deletes tape by ID
     def delete(self, tape_id):

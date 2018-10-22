@@ -15,3 +15,7 @@ class Tape_Nameko_api:
     @rpc
     def get_tape(self, tape_id):
         return self.tape_service.get_tape(tape_id)
+
+    @rpc
+    def add_tape(self, tape):
+        return self.tape_service.add_tape(tape)

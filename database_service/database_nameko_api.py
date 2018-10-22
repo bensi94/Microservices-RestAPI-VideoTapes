@@ -33,3 +33,7 @@ class Database_Nameko_api:
     def get_tape(self, tape_id):
         return self.db_tape_service.get_tape(tape_id)
 
+    @rpc
+    def add_tape(self, tape):
+        return self.db_tape_service.add_tape(tape)
+

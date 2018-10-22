@@ -2,12 +2,16 @@ from datetime import datetime
 
 class Tape:
     def __init__(self, id=None, title=None, director_first_name=None,
-                 director_last_name=None, type=None, release_date=None, eidr=None, input_tuple=None):
+                 director_last_name=None, type=None, release_date=None, eidr=None, input_tuple=None, director=None):
         
         if input_tuple is None:
-            self.id = int(id)
+            if id is not None:
+                self.id = int(id)
             self.title = title
-            self.director = director_first_name + ' ' + director_last_name
+            if director is None:
+                self.director = director_first_name + ' ' + director_last_name
+            else:
+                self.director = director
             self.type = type
             self.release_date = datetime.strptime(release_date, '%Y-%m-%d')
             self.eidr = eidr
