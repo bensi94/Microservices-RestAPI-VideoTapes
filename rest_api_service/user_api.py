@@ -15,7 +15,12 @@ class UserAPI(MethodView):
                 print(users)
                 return Response(json.dumps(users), mimetype='application/json')
             else:
-                return ('from else')
+                user = rpc.user_service.get_user(user_id = user_id)
+
+                if user is not None:
+                    return Response(json.dumps(user), mimetype='application/json')
+        
+        return('User not found!', 404)
         
     # Creates new user
     def post(self):

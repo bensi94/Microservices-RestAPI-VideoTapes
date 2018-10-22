@@ -6,3 +6,7 @@ class User_service:
     def get_users(self):
         with ClusterRpcProxy(CONFIG) as rpc:
            return rpc.database_service.get_users()
+
+    def get_user(self, user_id):
+        with ClusterRpcProxy(CONFIG) as rpc:
+            return rpc.database_service.get_user(user_id=user_id)

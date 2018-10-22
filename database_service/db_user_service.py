@@ -20,5 +20,15 @@ class Database_user_service:
 
         return users
 
+    def get_user(self, user_id):
+        user_table = self.users.get_users_table()
+        select_query = select([user_table]).where(user_table.c.id == user_id)
+        result = self.connection.execute(select_query)
+        result = result.fetchone()
 
+        if result is None:
+            return None
+        else:
+            user = User(input_tuple=result)
+            return user.return_as_dict()
 
