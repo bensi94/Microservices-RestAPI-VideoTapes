@@ -1,4 +1,4 @@
-from sqlalchemy import select, insert, func
+from sqlalchemy import select, insert, func, and_, update
 from shared_utils.logger import _log
 from entity_classes.tape import Tape
 from database_service.database_utils import Database_utils
@@ -62,11 +62,89 @@ class Database_tape_service:
 
             self.connection.execute(insert_query)
 
+            tape['id'] = new_id
+            
             response = {
                 'code': 200,
-                'msg': 'Tape added: title=' + tape['title'] + ' id=' + str(new_id)
+                'msg': json.dumps(tape)
             }
         return response
+
+    # Deletes user by id
+    def delete_tape(self, tape_id):
+        tape_table = self.tables.get_tapes_table()
+
+        if self.utils.check_if_exist(tape_table, tape_id) > 0:
+            self.delete_borrow(tape_id)
+            self.connection.execute(tape_table.delete().where(tape_table.c.id == tape_id))
+            response = {
+                'code': 200,
+                'msg': 'Tape with ID:' + str(tape_id) + ' deleted'
+            }
+        else:
+            response = {
+                'code': 400,
+                'msg': 'Tape ID does not exist'
+            }
+        return response
+    
+    # Updates tape at a spesific id
+    def update_tape(self, tape_id, tape):
+        tape_table = self.tables.get_tapes_table()
+
+        if self.utils.check_if_exist(tape_table, tape_id) > 0:
+            if int(self.connection.execute(select(
+                [func.count(tape_table.c.eidr)]).where(
+                    tape_table.c.eidr == tape['eidr'])).scalar()) > 0:
+                response = {
+                    'code': 400,
+                    'msg': 'Edir already exists'
+                }
+                return response
+
+            update_query = update(tape_table).values(
+                title=tape['title'],
+                director=tape['director'],
+                type=tape['type'],
+                release_date=tape['release_date'],
+                eidr=tape['eidr']
+            ).where(tape_table.c.id == tape_id)
+            self.connection.execute(update_query)
+            
+            tape['id'] = tape_id
+
+            response = {
+                'code': 200,
+                'msg': json.dumps(tape)
+            }
+        else:
+            response = {
+                'code': 400,
+                'msg': 'Tape ID does not exist'
+            }
+        return response
+
+
+
+    # Delete tapes from borrows, if user_id is set 
+    # it only deletes as single tape, otherwise all
+    def delete_borrow(self, tape_id, user_id=None):
+        borrow_table = self.tables.get_borrow_table()
+        
+        # Delete all borrows of tape
+        if user_id is None:
+            self.connection.execute(borrow_table.delete().where(
+                borrow_table.c.tape_id == tape_id))
+        # Delete borrow of tape by single user
+        else:
+             self.connection.execute(borrow_table.delete().where(and_(
+                 borrow_table.c.tape_id == tape_id, borrow_table.c.user_id == user_id)))
+
+    
+
+
+
+
 
 
 

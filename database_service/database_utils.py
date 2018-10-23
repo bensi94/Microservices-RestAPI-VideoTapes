@@ -10,3 +10,8 @@ class Database_utils:
 
     def get_max_id(self, table):
         return int(self.connection.execute(select([func.max(table.c.id)])).scalar()) + 1
+    
+    def check_if_exist(self, table, id):
+        select_query = select([func.count(table.c.id)]).where(
+            table.c.id == id)
+        return int(self.connection.execute(select_query).scalar())

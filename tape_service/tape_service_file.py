@@ -30,6 +30,25 @@ class Tape_service:
 
         return response
 
+    def delete_tape(self, tape_id):
+        with ClusterRpcProxy(CONFIG) as rpc:
+            return rpc.database_service.delete_tape(tape_id=tape_id)
+
+    def update_tape(self, tape_id, tape):
+        validation, msg = self.validate_tape(tape)
+
+        if validation:
+            tape['release_date'] = datetime.strptime(tape['release_date'], '%Y-%m-%d')
+            with ClusterRpcProxy(CONFIG) as rpc:
+                response = rpc.database_service.update_tape(tape_id, tape)
+        else:
+            response = {
+                'code': 400,
+                'msg': msg
+            }
+        return response
+
+
     def validate_tape(self, tape):
         if tape['title'] is None:
             return False, 'Title is required'

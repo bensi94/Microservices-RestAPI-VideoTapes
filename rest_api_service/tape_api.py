@@ -38,10 +38,21 @@ class TapeAPI(MethodView):
              
     #  Deletes tape by ID
     def delete(self, tape_id):
-        # TO DO: delete a single tape
-        pass
+       with ClusterRpcProxy(CONFIG) as rpc:
+           response = rpc.tape_service.delete_tape(tape_id)
+           return(response['msg'], response['code'])
 
     # Updates tape by ID
     def put(self, tape_id):
-        # TO DO: update a single tape
-        pass
+        tape = {
+            "title": request.args.get('title'),
+            "director": request.args.get('director'),
+            "type": request.args.get('type'),
+            "release_date": request.args.get('release_date'),
+            "eidr": request.args.get('eidr')
+        }
+
+        with ClusterRpcProxy(CONFIG) as rpc:
+            response = rpc.tape_service.update_tape(tape_id, tape)
+            return(response['msg'], response['code'])
+        
