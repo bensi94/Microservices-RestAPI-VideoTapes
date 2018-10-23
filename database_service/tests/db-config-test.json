@@ -1,0 +1,6 @@
+{
+    "POSTGRES_USER": "aslakur",
+    "POSTGRES_PASSWORD": "1234",
+    "POSTGRES_DB": "test_db",
+    "POSTGRES_HOST": "db"
+}

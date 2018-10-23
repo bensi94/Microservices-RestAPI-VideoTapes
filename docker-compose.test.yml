@@ -4,20 +4,17 @@ services:
   db:
     image: postgres
     environment:
-      POSTGRES_DB: video_tapes
+      POSTGRES_DB: test_db
       POSTGRES_USER: aslakur
       POSTGRES_PASSWORD: 1234
     ports:
       - 5432:5432
- 
-
   rabbit:
     image: rabbitmq:3.6-management
     ports:
       - 15672:15672
     logging:
       driver: none
-
 
   database_service:
     build:
@@ -33,7 +30,7 @@ services:
         RABBIT_PORT: "5672"
         RABBIT_MANAGEMENT_PORT: "15672"
         SERVICE_STRING: "database_service.database_nameko_api"
-        DB_CONFIG: "database_service/db-config.json"
+        DB_CONFIG: "database_service/tests/db-config-test.json"
 
   # recommendation_service:
   #   build:
@@ -111,10 +108,24 @@ services:
       RABBIT_HOST: "rabbit"
       RABBIT_PORT: "5672"
       RABBIT_MANAGEMENT_PORT: "15672"
-  
-    
-    
-
 
   
- 
+  test_service:
+    build:
+      context: ./
+      dockerfile: ./tests/Dockerfile
+    depends_on:
+      - db
+      - rabbit
+      - database_service
+      - rest_api_service
+      - user_service
+    environment:
+        RABBIT_PASSWORD: "guest"
+        RABBIT_USER: "guest"
+        RABBIT_HOST: "rabbit"
+        RABBIT_PORT: "5672"
+        RABBIT_MANAGEMENT_PORT: "15672"
+        DB_CONFIG: "database_service/tests/db-config-test.json"
+  
+    

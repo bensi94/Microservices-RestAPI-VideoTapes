@@ -1,0 +1,4 @@
+psycopg2==2.7.5
+SQLAlchemy==1.2.12
+pytest==3.9.1
+nameko==2.11.0

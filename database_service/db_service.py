@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine
 import json
+import os
 
 from database_service.tables import Tables
 from shared_utils.logger import _log
@@ -13,7 +14,7 @@ class Database_service:
         _log.info('Connecting to database')
 
         # Get the config for the database
-        with open('database_service/db-config.json', 'r') as file:
+        with open(os.environ['DB_CONFIG'], 'r') as file:
             config = json.load(file)
 
         user = config['POSTGRES_USER']
@@ -22,6 +23,8 @@ class Database_service:
         host = config['POSTGRES_HOST']
         connection_string = 'postgresql+psycopg2://' + \
             user + ':' + password + '@' + host + '/' + db
+
+        _log.info(connection_string)
 
         self.db = create_engine(connection_string)
         self.conn = self.db.connect()
