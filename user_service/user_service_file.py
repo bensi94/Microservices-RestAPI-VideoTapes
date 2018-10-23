@@ -11,6 +11,7 @@ class User_service:
     def get_user(self, user_id):
         with ClusterRpcProxy(CONFIG) as rpc:
             return rpc.database_service.get_user(user_id=user_id)
+            
     def add_user(self, user):
         validation, msg = self.validate_user(user)
 
@@ -23,7 +24,23 @@ class User_service:
                 'msg': msg
             }
         return response
-        
+    
+    def delete_user(self, user_id):
+        with ClusterRpcProxy(CONFIG) as rpc:
+            return rpc.database_service.delete_user(user_id=user_id)
+    
+    def update_user(self, user_id, user):
+        validation, msg = self.validate_user(user)
+
+        if validation:
+            with ClusterRpcProxy(CONFIG) as rpc:
+                response = rpc.database_service.update_user(user_id, user)
+        else:
+            response = {
+                'code': 400,
+                'msg': msg
+            }
+        return response
         
     def validate_user(self, user):
         if user['name'] is None:
