@@ -66,3 +66,7 @@ class Database_Nameko_api:
     @rpc 
     def update_tape(self, tape_id, tape):
         return self.db_tape_service.update_tape(tape_id, tape)
+
+    @rpc
+    def register_tape(self, borrow):
+        return self.db_tape_service.register_tape(borrow)
