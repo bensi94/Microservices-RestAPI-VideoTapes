@@ -45,7 +45,9 @@ class Database_user_service:
             phone = user['phone'],
             address = user['address']
         )
-
         self.connection.execute(insert_query)
-
-        return('User added: name=' + user['name'] + ' id = ' + str(new_id))
+        response = {
+            'code': 200,
+            'msg': 'User added: name='+ user['name'] + ' id = ' + str(new_id)
+        }
+        return response
