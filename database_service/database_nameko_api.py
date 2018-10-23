@@ -38,6 +38,15 @@ class Database_Nameko_api:
     @rpc
     def add_user(self, user):
         return self.db_user_service.add_user(user)
+
+    @rpc
+    def delete_user(self, user_id):
+        return self.db_user_service.delete_user(user_id)
+    
+    @rpc
+    def update_user(self, user_id, user):
+        return self.db_user_service.update_user(user_id, user)
+    
     @rpc
     def get_tapes(self):
         return self.db_tape_service.get_tapes()

@@ -24,10 +24,10 @@ class UserAPI(MethodView):
         
     # Creates new user
     def post(self):
-        name = request.args.get('name')
+        #name = request.args.get('name')
 
-        if name is None:
-            return ('Name is required!', 400)
+       # if name is None:
+       #     return ('Name is required!', 400)
         
         user = {
             'name': request.args.get('name'),
@@ -38,15 +38,23 @@ class UserAPI(MethodView):
 
         with ClusterRpcProxy(CONFIG) as rpc:
             response = rpc.user_service.add_user(user)
-        
-        return(response)
+            return(response['msg'], response['code'])
     #  Deletes user by ID
     def delete(self, user_id):
-        # TO DO: delete a single user
-        pass
+        with ClusterRpcProxy(CONFIG) as rpc:
+            response = rpc.user_service.delete_user(user_id)
+            return(response['msg'], response['code'])
 
     # Updates user by ID
     def put(self, user_id):
-        # TO DO: update a single user
-        pass
+        user = {
+            'name':request.args.get('name'),
+            'email':request.args.get('email'),
+            'phone':request.args.get('phone'),
+            'address':request.args.get('address')
+        }
+
+        with ClusterRpcProxy(CONFIG) as rpc:
+            response = rpc.user_service.update_user(user_id, user)
+            return(response['msg'], response['code'])
         
