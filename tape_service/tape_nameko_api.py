@@ -27,3 +27,15 @@ class Tape_Nameko_api:
     @rpc
     def update_tape(self, tape_id, tape):
         return self.tape_service.update_tape(tape_id, tape)
+    
+    @rpc
+    def register_tape(self, borrow):
+        return self.tape_service.register_tape(borrow)
+    
+    @rpc
+    def return_tape(self, user_id, tape_id):
+        return self.tape_service.return_tape(user_id, tape_id)
+
+    @rpc
+    def update_registration(self, borrow):
+        return self.tape_service.update_registration(borrow)

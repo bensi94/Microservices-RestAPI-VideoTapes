@@ -117,12 +117,13 @@ class Database_tape_service:
                 'code': 200,
                 'msg': json.dumps(tape)
             }
+            return response
         else:
             response = {
                 'code': 400,
                 'msg': 'Tape ID does not exist'
             }
-        return response
+            return response
 
 
 
@@ -153,11 +154,13 @@ class Database_tape_service:
                 'code': 400,
                 'msg': 'No tape with that ID exists'
             }
+            return response
         elif not self.utils.check_if_exist(user_table, borrow['user_id']):
             response = {
                 'code': 400,
                 'msg': 'No user with that ID exists'
             }
+            return response
 
         else: 
             insert_query = insert(borrow_table).values(
@@ -176,11 +179,27 @@ class Database_tape_service:
                 'code': 200,
                 'msg': json.dumps(borrow)
             }
-        return response
+            return response
 
+    def return_tape(self, return_date, user_id, tape_id):
+        borrow_table = self.tables.get_borrow_table()
+        if self.utils.check_if_borrow_exists(borrow_table, user_id, tape_id):
+            response = {
+                'code': 400,
+                'msg': 'The user with this ID has not borrowed tape with this ID'
+            }
+            return response
+        else:
+            response = {
+                'code': 200,
+                'msg': 'Tape has been returned'
+            }
+            update_query = update(borrow_table).values(
+                return_date = return_date
+            ).where(and_(borrow_table.c.tape_id == tape_id, 
+                borrow_table.c.user_id == user_id))
+            self.connection.execute(update_query)
 
-
-
-
-
-
+            return response
+    def update_registration(self, borrow):
+        return 0    

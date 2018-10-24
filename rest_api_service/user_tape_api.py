@@ -1,7 +1,7 @@
 from flask.views import MethodView
 from nameko.standalone.rpc import ClusterRpcProxy
 from shared_utils.config import CONFIG
-from flask import Response
+from flask import Response, request
 
 class UserTapeAPI(MethodView):
 
@@ -23,10 +23,19 @@ class UserTapeAPI(MethodView):
             return(response['msg'], response['code'])
     #  Returns tape that was on loan
     def delete(self, user_id, tape_id):
-        # TO DO: return the tape
-        pass
+        with ClusterRpcProxy(CONFIG) as rpc:
+            response = rpc.tape_service.return_tape(user_id, tape_id)
+            return(response['msg'], response['code'])
 
     # Updates borrowing information
     def put(self, user_id, tape_id):
-        # TO DO: update the tape information
-        pass
+        borrow = {
+            "user_id": user_id,
+            "tape_id": tape_id,
+            "borrow_date": request.args.get('borrow_date'),
+            "return_date": request.args.get('return_date')
+        }
+
+        with ClusterRpcProxy(CONFIG) as rpc:
+            response = rpc.tape_service.update_registration(borrow)
+            return(response['msg'], response['code'])

@@ -24,7 +24,6 @@ app.add_url_rule('/tapes/', defaults={'tape_id': None},
 app.add_url_rule('/tapes',  view_func=tape_view, methods=['POST', ])
 app.add_url_rule('/tapes/<int:tape_id>', view_func=tape_view,
                  methods=['GET', 'PUT', 'DELETE'])
-
 app.add_url_rule('/users/<int:user_id>/tapes', defaults={'tape_id': None},
                 view_func = user_tape_view, methods=['GET', ])
 app.add_url_rule('/users/<int:user_id>/tapes/<int:tape_id>', view_func=user_tape_view, 
