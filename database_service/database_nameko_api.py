@@ -66,3 +66,9 @@ class Database_Nameko_api:
     @rpc 
     def update_tape(self, tape_id, tape):
         return self.db_tape_service.update_tape(tape_id, tape)
+
+    #ONLY USED FOR TESTING, HANDLE WITH CARE
+    @rpc
+    def delete_and_populate(self):
+        return self.database_service.delete_and_populate()
+        

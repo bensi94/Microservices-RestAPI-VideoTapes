@@ -1,0 +1,16 @@
+version: '3.7'
+
+services:
+  test_service:
+    build:
+      context: ./
+      dockerfile: ./tests/Dockerfile
+    environment:
+        RABBIT_PASSWORD: "guest"
+        RABBIT_USER: "guest"
+        RABBIT_HOST: "rabbit"
+        RABBIT_PORT: "5672"
+        RABBIT_MANAGEMENT_PORT: "15672"
+        DB_CONFIG: "database_service/tests/db-config-test.json"
+  
+    

@@ -38,19 +38,19 @@ class Database_user_service:
 
     def add_user(self, user):
         user_table = self.tables.get_users_table()
-        new_id = self.utils.get_max_id(user_table)
 
         insert_query = insert(user_table).values(
-            id = new_id,
             name = user['name'],
             email = user['email'],
             phone = user['phone'],
             address = user['address']
         )
-        self.connection.execute(insert_query)
+        current_id = self.connection.execute(insert_query).inserted_primary_key[0]
+        user['id'] = current_id
+
         response = {
             'code': 200,
-            'msg': 'User added: name='+ user['name'] + ' id = ' + str(new_id)
+            'msg': json.dumps(user)
         }
         return response
 

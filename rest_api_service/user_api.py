@@ -12,7 +12,6 @@ class UserAPI(MethodView):
         with ClusterRpcProxy(CONFIG) as rpc:
             if user_id is None:
                 users = rpc.user_service.get_users()
-                print(users)
                 return Response(json.dumps(users), mimetype='application/json')
             else:
                 user = rpc.user_service.get_user(user_id = user_id)
@@ -24,11 +23,6 @@ class UserAPI(MethodView):
         
     # Creates new user
     def post(self):
-        #name = request.args.get('name')
-
-       # if name is None:
-       #     return ('Name is required!', 400)
-        
         user = {
             'name': request.args.get('name'),
             'email': request.args.get('email'),
