@@ -50,6 +50,17 @@ class Tables:
         borrow_table.create(self.db, checkfirst=True)
         self.borrow_table = borrow_table
 
+        ## REVIEW table schema
+        review_table = Table('reviews', self.meta,
+                             Column('id', Integer, Sequence('reviews_id_seq', metadata=self.meta), primary_key=True),
+                             Column('user_id', Integer, ForeignKey(
+                                 'users.id'), nullable=False),
+                             Column('tape_id', Integer, ForeignKey(
+                                 'tapes.id'), nullable=False),
+                             Column('rating', Integer, nullable=False))
+        review_table.create(self.db, checkfirst=True)
+        self.review_table = review_table
+
     def populate_tables(self):
 
         # Data base is only populated if it's empty before
@@ -99,4 +110,6 @@ class Tables:
     def get_borrow_table(self):
         return self.borrow_table
     
+    def get_review_table(self):
+        return self.review_table
   

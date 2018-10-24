@@ -74,6 +74,7 @@ class Database_tape_service:
 
         if self.utils.check_if_exist(tape_table, tape_id) > 0:
             self.delete_borrow(tape_id)
+            self.delete_review(tape_id)
             self.connection.execute(tape_table.delete().where(tape_table.c.id == tape_id))
             response = {
                 'code': 200,
@@ -138,6 +139,20 @@ class Database_tape_service:
         else:
              self.connection.execute(borrow_table.delete().where(and_(
                  borrow_table.c.tape_id == tape_id, borrow_table.c.user_id == user_id)))
+
+    # Delete tapes from reveiws, if user_id is set
+    # it only deletes as single review, otherwise all
+    def delete_review(self, tape_id, user_id=None):
+        review_table = self.tables.get_review_table()
+
+        # Delete all reviews of tape
+        if user_id is None:
+            self.connection.execute(review_table.delete().where(
+                review_table.c.tape_id == tape_id))
+        # Delete review of tape by single user
+        else:
+             self.connection.execute(review_table.delete().where(and_(
+                 review_table.c.tape_id == tape_id, review_table.c.user_id == user_id)))
 
     
     def register_tape(self, borrow):

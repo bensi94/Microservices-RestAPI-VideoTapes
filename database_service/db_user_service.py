@@ -58,6 +58,7 @@ class Database_user_service:
         user_table = self.tables.get_users_table()
         if self.utils.check_if_exist(user_table, user_id) > 0:
             self.delete_borrow(user_id)
+            self.delete_review(user_id)
             self.connection.execute(user_table.delete().where(user_table.c.id == user_id))
             response = {
                 'code': 200,
@@ -95,6 +96,9 @@ class Database_user_service:
                 'msg': 'User ID does not exist'
             }
         return response
+
+    # Delete users from borrws, if user_id is set
+    # it only deletes as single review, otherwise all
     def delete_borrow(self, user_id, tape_id=None):
         borrow_table = self.tables.get_borrow_table()
         
@@ -106,3 +110,17 @@ class Database_user_service:
         else:
              self.connection.execute(borrow_table.delete().where(and_(
                  borrow_table.c.user_id == user_id, borrow_table.c.tape_id == tape_id)))
+
+    # Delete users from reveiws, if tape_id is set
+    # it only deletes as single review, otherwise all
+    def delete_review(self, user_id, tape_id=None):
+        review_table = self.tables.get_review_table()
+
+        # Delete all reviews of tape
+        if tape_id is None:
+            self.connection.execute(review_table.delete().where(
+                review_table.c.user_id == user_id))
+        # Delete review of tape by single user
+        else:
+             self.connection.execute(review_table.delete().where(and_(
+                 review_table.c.user_id == user_id, review_table.c.tape_id == tape_id)))
