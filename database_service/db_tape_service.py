@@ -181,7 +181,7 @@ class Database_tape_service:
 
     def return_tape(self, return_date, user_id, tape_id):
         borrow_table = self.tables.get_borrow_table()
-        if self.utils.check_if_borrow_exists(borrow_table, user_id, tape_id):
+        if  not self.utils.check_if_borrow_exists(borrow_table, user_id, tape_id):
             response = {
                 'code': 400,
                 'msg': 'The user with this ID has not borrowed tape with this ID'

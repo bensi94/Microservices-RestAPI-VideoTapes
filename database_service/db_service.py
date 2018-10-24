@@ -68,6 +68,3 @@ class Database_service:
 
         self.tables.populate_tables()
         return ('Tables Deleted and repopulated!')
-       
-
-
