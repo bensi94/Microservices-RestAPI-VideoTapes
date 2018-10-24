@@ -67,6 +67,19 @@ class Tape_service:
         return True, ''
     
     def register_tape(self, borrow):
-        borrow['borrow_date'] = datetime.datetime.today().strftime('%Y-%m-%d')
+        borrow['borrow_date'] = datetime.today().strftime('%Y-%m-%d')
         with ClusterRpcProxy(CONFIG) as rpc:
             response = rpc.database_service.register_tape(borrow)
+            return response
+    
+    def return_tape(self, user_id, tape_id):
+        return_date = datetime.today().strftime('%Y-%m-%d')
+        with ClusterRpcProxy(CONFIG) as rpc:
+            response = rpc.database_service.return_tape(return_date, user_id, tape_id)
+            return response
+    def update_registration(self, borrow):
+        # TO DO: Validate the new dates...
+        with ClusterRpcProxy(CONFIG) as rpc:
+            response = rpc.database_service.update_registration(borrow)
+            return response
+

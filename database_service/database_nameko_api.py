@@ -70,6 +70,14 @@ class Database_Nameko_api:
     @rpc
     def register_tape(self, borrow):
         return self.db_tape_service.register_tape(borrow)
+    
+    @rpc
+    def return_tape(self, return_date, user_id, tape_id):
+        return self.db_tape_service.return_tape(return_date, user_id, tape_id)
+    
+    @rpc
+    def update_registration(self, borrow):
+        return self.db_tape_service.update_registration(borrow)
 
     #ONLY USED FOR TESTING, HANDLE WITH CARE
     @rpc
