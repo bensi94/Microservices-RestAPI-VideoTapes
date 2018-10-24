@@ -65,4 +65,8 @@ class Tape_service:
             return False, 'Invalid eidr'
 
         return True, ''
-        
+    
+    def register_tape(self, borrow):
+        borrow['borrow_date'] = datetime.datetime.today().strftime('%Y-%m-%d')
+        with ClusterRpcProxy(CONFIG) as rpc:
+            response = rpc.database_service.register_tape(borrow)

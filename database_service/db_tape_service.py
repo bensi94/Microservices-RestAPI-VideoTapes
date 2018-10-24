@@ -139,7 +139,42 @@ class Database_tape_service:
                  borrow_table.c.tape_id == tape_id, borrow_table.c.user_id == user_id)))
 
     
+    def register_tape(self, borrow):
+        tape_table = self.tables.get_tapes_table()
+        user_table = self.tables.get_tapes_table()
+        borrow_table = self.tables.get_borrow_table()
+        new_id = self.utils.get_max_id(borrow_table)
 
+        # Checking if user_id and tape_id both exist
+        if not self.utils.check_if_exist(tape_table, borrow['tape_id']):
+            response = {
+                'code': 400,
+                'msg': 'No tape with that ID exists'
+            }
+        elif not self.utils.check_if_exist(user_table, borrow['user_id']):
+            response = {
+                'code': 400,
+                'msg': 'No user with that ID exists'
+            }
+
+        else: 
+            insert_query = insert(borrow_table).values(
+                id=new_id,
+                tape_id=borrow['tape_id'],
+                user_id=borrow['user_id'],
+                borrow_date = borrow['borrow_date'],
+                return_date = None
+            )
+
+            self.connection.execute(insert_query)
+
+            borrow['id'] = new_id
+            
+            response = {
+                'code': 200,
+                'msg': json.dumps(borrow)
+            }
+        return response
 
 
 

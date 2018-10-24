@@ -2,7 +2,7 @@ from sqlalchemy import select, insert, func, and_, update
 from shared_utils.logger import _log
 from entity_classes.user import User
 from database_service.database_utils import Database_utils
-from database_service.db_tape_service import Database_tape_service
+#from database_service.db_tape_service import Database_tape_service
 import json
 
 class Database_user_service:
