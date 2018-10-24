@@ -63,6 +63,7 @@ class Database_service:
         self.conn.execute('ALTER SEQUENCE users_id_seq RESTART WITH 1')
         self.conn.execute('ALTER SEQUENCE tapes_id_seq RESTART WITH 1')
         self.conn.execute('ALTER SEQUENCE borrows_id_seq RESTART WITH 1')
+        self.conn.execute('ALTER SEQUENCE reviews_id_seq RESTART WITH 1')
 
         trans.commit()
 
