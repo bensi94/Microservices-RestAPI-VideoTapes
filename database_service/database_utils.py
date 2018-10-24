@@ -17,7 +17,8 @@ class Database_utils:
         return int(self.connection.execute(select_query).scalar())
     
     def check_if_borrow_exists(self, borrow_table, user_id, tape_id):
-        select_query = select([borrow_table]).where(and_(borrow_table.c.tape_id == tape_id , borrow_table.c.user_id == user_id))
+        select_query = select([borrow_table]).where(
+            and_(borrow_table.c.tape_id == tape_id , borrow_table.c.user_id == user_id))
         result = self.connection.execute(select_query)
         result = result.fetchone()
 
