@@ -34,8 +34,6 @@ services:
         RABBIT_MANAGEMENT_PORT: "15672"
         SERVICE_STRING: "database_service.database_nameko_api"
         DB_CONFIG: "database_service/tests/db-config-test.json"
-    # logging:
-    #   driver: none
 
   # recommendation_service:
   #   build:
@@ -71,22 +69,21 @@ services:
   #   logging:
   #     driver: none
 
-  # tape_service:
-  #   build:
-  #     context: ./
-  #     dockerfile: ./tape_service/Dockerfile
-  #   depends_on:
-  #     - db
-  #     - rabbit
-  #   environment:
-  #       RABBIT_PASSWORD: "guest"
-  #       RABBIT_USER: "guest"
-  #       RABBIT_HOST: "rabbit"
-  #       RABBIT_PORT: "5672"
-  #       RABBIT_MANAGEMENT_PORT: "15672"
-  #       SERVICE_STRING: "tape_service.tape_nameko_api"
-  #   logging:
-  #     driver: none
+  tape_service:
+    build:
+      context: ./
+      dockerfile: ./tape_service/Dockerfile
+    depends_on:
+      - db
+      - rabbit
+    environment:
+        RABBIT_PASSWORD: "guest"
+        RABBIT_USER: "guest"
+        RABBIT_HOST: "rabbit"
+        RABBIT_PORT: "5672"
+        RABBIT_MANAGEMENT_PORT: "15672"
+        SERVICE_STRING: "tape_service.tape_nameko_api"
+
 
   user_service:
     build:
@@ -102,8 +99,6 @@ services:
         RABBIT_PORT: "5672"
         RABBIT_MANAGEMENT_PORT: "15672"
         SERVICE_STRING: "user_service.user_nameko_api"
-    # logging:
-    #   driver: none
 
   rest_api_service:
     build:
@@ -120,5 +115,3 @@ services:
       RABBIT_HOST: "rabbit"
       RABBIT_PORT: "5672"
       RABBIT_MANAGEMENT_PORT: "15672"
-    # logging:
-    #   driver: none

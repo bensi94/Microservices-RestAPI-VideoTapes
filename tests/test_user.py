@@ -1,5 +1,4 @@
 import pytest
-import time
 import requests
 import json
 from nameko.standalone.rpc import ClusterRpcProxy
