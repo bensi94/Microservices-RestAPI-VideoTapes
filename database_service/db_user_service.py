@@ -38,19 +38,19 @@ class Database_user_service:
 
     def add_user(self, user):
         user_table = self.tables.get_users_table()
-        new_id = self.utils.get_max_id(user_table)
 
         insert_query = insert(user_table).values(
-            id = new_id,
             name = user['name'],
             email = user['email'],
             phone = user['phone'],
             address = user['address']
         )
-        self.connection.execute(insert_query)
+        current_id = self.connection.execute(insert_query).inserted_primary_key[0]
+        user['id'] = current_id
+
         response = {
             'code': 200,
-            'msg': 'User added: name='+ user['name'] + ' id = ' + str(new_id)
+            'msg': json.dumps(user)
         }
         return response
 
@@ -99,7 +99,7 @@ class Database_user_service:
         borrow_table = self.tables.get_borrow_table()
         
         # Delete all borrows of user
-        if user_id is None:
+        if tape_id is None:
             self.connection.execute(borrow_table.delete().where(
                 borrow_table.c.user_id == user_id))
         # Delete borrow of user by single tape

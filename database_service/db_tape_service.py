@@ -39,7 +39,6 @@ class Database_tape_service:
     # Makes Insert query for tape
     def add_tape(self, tape):
         tape_table = self.tables.get_tapes_table()
-        new_id = self.utils.get_max_id(tape_table)
 
         # Checking if eidr exists in database
         if int(self.connection.execute(select(
@@ -52,7 +51,6 @@ class Database_tape_service:
 
         else: 
             insert_query = insert(tape_table).values(
-                id=new_id,
                 title=tape['title'],
                 director=tape['director'],
                 type=tape['type'],
@@ -60,9 +58,9 @@ class Database_tape_service:
                 eidr=tape['eidr']
             )
 
-            self.connection.execute(insert_query)
+            current_id = self.connection.execute(insert_query).inserted_primary_key[0]
+            tape['id'] = current_id
 
-            tape['id'] = new_id
             
             response = {
                 'code': 200,

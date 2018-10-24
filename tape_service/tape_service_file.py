@@ -59,7 +59,7 @@ class Tape_service:
             if not pattern.match(tape['release_date']):
                 return False, 'Invalid date'
 
-        pattern = re.compile('^10.5240/([A-Z]{4}-){5}C$')
+        pattern = re.compile('^10.5240/(([A-Z]|[0-9]){4}-){5}[A-Z]$')
 
         if not pattern.match(tape['eidr']):
             return False, 'Invalid eidr'
@@ -82,3 +82,4 @@ class Tape_service:
         with ClusterRpcProxy(CONFIG) as rpc:
             response = rpc.database_service.update_registration(borrow)
             return response
+

@@ -1,12 +1,12 @@
-from sqlalchemy import  select, func, Table, Column, String, MetaData, Integer, Date, ForeignKey, insert
+from sqlalchemy import  select, func, Table, Column, String, MetaData, Integer, Date, ForeignKey, insert, Sequence
 from database_service.json_service import Json_service
 from database_service.database_utils import Database_utils
 from shared_utils.logger import _log
 
 class Tables:
-    def __init__(self, engine, connection):
+    def __init__(self, engine, connection, meta):
         self.db = engine 
-        self.meta = MetaData(self.db)
+        self.meta = meta
         self.users_table = None
         self.tapes_table = None
         self.borrow_table = None
@@ -19,7 +19,7 @@ class Tables:
 
         ## USERS table schema
         users_table = Table('users', self.meta,
-                            Column('id', Integer, primary_key=True),
+                            Column('id', Integer,  Sequence('users_id_seq', metadata=self.meta), primary_key=True),
                             Column('name', String, nullable=False),
                             Column('email', String),
                             Column('phone', String),
@@ -29,7 +29,7 @@ class Tables:
 
         ## TAPES table schema
         tapes_table = Table('tapes', self.meta,
-                            Column('id', Integer, primary_key=True),
+                            Column('id', Integer, Sequence('tapes_id_seq', metadata=self.meta), primary_key=True),
                             Column('title', String, nullable=False),
                             Column('director', String),
                             Column('type', String),
@@ -40,7 +40,7 @@ class Tables:
 
         ## BORROW table schema
         borrow_table = Table('borrows', self.meta,
-                             Column('id', Integer, primary_key=True),
+                             Column('id', Integer, Sequence('borrows_id_seq', metadata=self.meta), primary_key=True),
                              Column('user_id', Integer, ForeignKey(
                                  'users.id'), nullable=False),
                              Column('tape_id', Integer, ForeignKey(
@@ -51,7 +51,7 @@ class Tables:
         self.borrow_table = borrow_table
 
     def populate_tables(self):
-        
+
         # Data base is only populated if it's empty before
         if (self.utils.count_rows(self.users_table) == 0 and 
             self.utils.count_rows(self.tapes_table) == 0 and 
@@ -59,11 +59,11 @@ class Tables:
         
             _log.info('Populating tables')
             json_service = Json_service()
-            json_service.read_json()
+            if len(json_service.get_users()) == 0:
+                json_service.read_json()
             
             for user in json_service.get_users():
                 insert_query = insert(self.users_table).values(
-                    id=user.id,
                     name=user.name,
                     email=user.email,
                     phone=user.phone,
@@ -73,7 +73,6 @@ class Tables:
             
             for tape in json_service.get_tape_list():
                 insert_query = insert(self.tapes_table).values(
-                    id=tape.id,
                     title=tape.title,
                     director=tape.director,
                     type=tape.type,
@@ -84,7 +83,6 @@ class Tables:
 
             for borrow in json_service.get_borrow_list():
                 insert_query = insert(self.borrow_table).values(
-                    id=borrow.id,
                     user_id=borrow.user_id,
                     tape_id=borrow.id,
                     borrow_date=borrow.borrow_date,
@@ -100,7 +98,5 @@ class Tables:
 
     def get_borrow_table(self):
         return self.borrow_table
-        
-
-
+    
   

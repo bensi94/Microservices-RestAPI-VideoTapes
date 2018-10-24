@@ -78,3 +78,9 @@ class Database_Nameko_api:
     @rpc
     def update_registration(self, borrow):
         return self.db_tape_service.update_registration(borrow)
+
+    #ONLY USED FOR TESTING, HANDLE WITH CARE
+    @rpc
+    def delete_and_populate(self):
+        return self.database_service.delete_and_populate()
+        

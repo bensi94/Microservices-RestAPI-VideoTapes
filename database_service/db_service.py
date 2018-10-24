@@ -1,9 +1,11 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, MetaData
 import json
 import os
+import time
 
 from database_service.tables import Tables
 from shared_utils.logger import _log
+from sqlalchemy_utils import drop_database, create_database
 
 class Database_service:
 
@@ -28,12 +30,15 @@ class Database_service:
 
         self.db = create_engine(connection_string)
         self.conn = self.db.connect()
+        self.meta = MetaData(self.db)
+
+        self.connection_string = connection_string
 
     # Initializes tables and data in the database
     def init_database(self):
         _log.info('Initializing to database')
 
-        self.tables = Tables(self.db, self.conn)
+        self.tables = Tables(self.db, self.conn, self.meta)
 
         # Tables created here if they don't exist
         self.tables.create_tables()
@@ -47,5 +52,22 @@ class Database_service:
     def get_tables(self):
         return self.tables
 
+    # ONLY USED FOR TESTING, HANDLE WITH CARE
+    def delete_and_populate(self):
+        trans = self.conn.begin()
+
+        for table in reversed(self.meta.sorted_tables):
+            delete_string = table.delete()
+            _log.info(delete_string)
+            self.conn.execute(delete_string)
+        self.conn.execute('ALTER SEQUENCE users_id_seq RESTART WITH 1')
+        self.conn.execute('ALTER SEQUENCE tapes_id_seq RESTART WITH 1')
+        self.conn.execute('ALTER SEQUENCE borrows_id_seq RESTART WITH 1')
+
+        trans.commit()
+
+        self.tables.populate_tables()
+        return ('Tables Deleted and repopulated!')
+       
 
 
