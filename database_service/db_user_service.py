@@ -99,7 +99,7 @@ class Database_user_service:
         borrow_table = self.tables.get_borrow_table()
         
         # Delete all borrows of user
-        if user_id is None:
+        if tape_id is None:
             self.connection.execute(borrow_table.delete().where(
                 borrow_table.c.user_id == user_id))
         # Delete borrow of user by single tape

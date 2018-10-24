@@ -13,8 +13,6 @@ def run_around_tests():
         rpc.database_service.delete_and_populate()
    #yield
  
-
-
 # Testing user get
 def test_get_all():
     "Gets all users from the database and tests the length of the response"
@@ -62,7 +60,17 @@ def test_get_56():
     assert resp.json() == test_dict
     assert resp.status_code == 200
 
+def test_get_invalid():
+    "Gets invalid user from the database"
+    print("TESTING GET URL: /users/1000")
 
+    url = 'http://rest_api_service/users/1000'
+    resp = requests.get(url)
+
+    assert resp.text == 'User not found!'
+    assert resp.status_code == 404
+
+# Testing user post
 def test_post_invalid_name():
     "Posts invalid user and returns error"
     print("TESTING POST URL: /users")
@@ -73,9 +81,8 @@ def test_post_invalid_name():
     assert resp.status_code == 400
     assert resp.text == 'Name is required'
 
-
 def test_post_invalid_email():
-    "Posts invalid user and returns error"
+    "Posts invalid email and returns error"
     print("TESTING POST URL: /users?name=Bensi&email=blala&phone=5812345&address=Menntavegur 1")
 
     data = {
@@ -91,9 +98,8 @@ def test_post_invalid_email():
     assert resp.status_code == 400
     assert resp.text == 'Invalid email format.'
 
-
 def test_post_invalid_phone():
-    "Posts invalid user and returns error"
+    "Posts invalid phone and returns error"
     print("TESTING POST URL: /users?name=Bensi&email=bensi@bensi.is&phone=blala&address=Menntavegur 1")
 
     data = {
@@ -107,10 +113,9 @@ def test_post_invalid_phone():
 
     assert resp.status_code == 400
     assert resp.text == 'Invalid phone number format'
-
-    
+ 
 def test_post_bensi():
-    "Posts invalid user and returns error"
+    "Posts valid users and checks response and database after"
     print("TESTING POST URL: /users?name=Bensi&email=bensi@bensi.is&phone=5812345&address=Menntavegur 1")
 
     data = {
@@ -120,13 +125,131 @@ def test_post_bensi():
         'address': 'Menntavegur 1'
     }
     url = 'http://rest_api_service/users'
-    resp = requests.post(url, params=data)
+    pots_resp = requests.post(url, params=data)
 
     data['id'] = 101
 
+    # Get is used to get check if the post went into the database
+    url = 'http://rest_api_service/users'
+    get_resp = requests.get(url)
+
+    assert get_resp.status_code == 200
+    assert len(get_resp.json()) == 101
+    assert pots_resp.status_code == 200
+    assert pots_resp.json() == data
+
+# Testing user put
+def test_put_invalid():
+    "Tests put  invalid user and returns error"
+    print("TESTING PUT URL: /users/1000?name=Bensi&email=bensi@bensi.is&phone=5812345&address=Menntavegur 1")
+
+    data = {
+        'name': 'Bensi',
+        'email': 'bensi@bensi.is',
+        'phone': '5812345',
+        'address': 'Menntavegur 1'
+    }
+    url = 'http://rest_api_service/users/1000'
+    pots_resp = requests.put(url, params=data)
+
+    assert pots_resp.status_code == 400
+    assert pots_resp.text == 'User ID does not exist'
+
+def test_put_invalid_email():
+    "Put invalid email and returns error"
+    print("TESTING PUT URL: /users/1?name=Bensi&email=blala&phone=5812345&address=Menntavegur 1")
+
+    data = {
+        'name': 'Bensi',
+        'email': 'blala',
+        'phone': '5812345',
+        'address': 'Menntavegur 1'
+    }
+    url = 'http://rest_api_service/users/1'
+    resp = requests.put(url, params=data)
+
+    assert resp.status_code == 400
+    assert resp.text == 'Invalid email format.'
+
+def test_put_invalid_phone():
+    "Put invalid phone and returns error"
+    print("TESTING PUT URL: /users/1?name=Bensi&email=bensi@bensi.is&phone=blala&address=Menntavegur 1")
+
+    data = {
+        'name': 'Bensi',
+        'email': 'bensi@bensi.is',
+        'phone': 'blala',
+        'address': 'Menntavegur 1'
+    }
+    url = 'http://rest_api_service/users/1'
+    resp = requests.put(url, params=data)
+
+    assert resp.status_code == 400
+    assert resp.text == 'Invalid phone number format'
+
+def test_put_bensi():
+    "Tests put  on valid user id"
+    print("TESTING PUT URL: /users/1?name=Bensi&email=bensi@bensi.is&phone=5812345&address=Menntavegur 1")
+
+    data = {
+        'name': 'Bensi',
+        'email': 'bensi@bensi.is',
+        'phone': '5812345',
+        'address': 'Menntavegur 1'
+    }
+
+    url = 'http://rest_api_service/users/1'
+    pots_resp = requests.put(url, params=data)
+
+    # Get is used to get check if the put went into the database
+    url = 'http://rest_api_service/users/1'
+    get_resp = requests.get(url)
+
+    data['id'] = 1
+
+    assert get_resp.status_code == 200
+    assert get_resp.json() == data
+    assert pots_resp.status_code == 200
+    assert pots_resp.json() == data
+
+# Testing user delete
+def test_delete_invalid():
+    "Tests delete  on invalid user id"
+    print("TESTING Delete URL: /users/1000")
+
+    url = 'http://rest_api_service/users/1000'
+    delete_response = requests.delete(url)
+
+    assert delete_response.status_code == 400
+    assert delete_response.text == 'User ID does not exist'
+
+def test_delete_valid():
+    "Tests delete  on valid user id"
+    print("TESTING Delete URL: /users/1")
+
+    url = 'http://rest_api_service/users/1'
+    delete_response = requests.delete(url)
+
+    # Get is used to get check if the put went into the database
+    url = 'http://rest_api_service/users/1'
+    get_resp = requests.get(url)
+
+
+    assert delete_response.status_code == 200
+    assert delete_response.text == 'User with ID:1 deleted'
+    assert get_resp.status_code == 404
+    assert get_resp.text == 'User not found!'
+
+def test_delete_all_users():
+    "Tests deleteing all user from the database"
+    print("TESTING Delete ALL USERS")
+
+    for i in range (1, 101):
+        url = 'http://rest_api_service/users/' + str(i)
+        requests.delete(url)
+    
+    url = 'http://rest_api_service/users'
+    resp = requests.get(url)
+
     assert resp.status_code == 200
-    assert resp.json() == data
-
-    
-
-    
+    assert len(resp.json()) == 0
