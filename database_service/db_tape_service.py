@@ -196,13 +196,20 @@ class Database_tape_service:
 
     def return_tape(self, return_date, user_id, tape_id):
         borrow_table = self.tables.get_borrow_table()
+
         if  not self.utils.check_if_borrow_exists(borrow_table, user_id, tape_id):
             response = {
                 'code': 400,
-                'msg': 'The user with this ID has not borrowed tape with this ID'
+                'msg': 'The user with this ID does not have tape on loan with this ID.'
             }
             return response
         else:
+            if not self.utils.return_date_is_none(borrow_table, user_id, tape_id):
+                response = {
+                    'code': 400,
+                    'msg': 'Tape has already been returned.'
+                }
+                return response
             response = {
                 'code': 200,
                 'msg': 'Tape has been returned'
@@ -215,4 +222,36 @@ class Database_tape_service:
 
             return response
     def update_registration(self, borrow):
-        return 0    
+        borrow_table = self.tables.get_borrow_table()
+        if self.utils.check_if_borrow_exists(borrow_table, borrow['user_id'], borrow['tape_id']):
+            update_query = update(borrow_table).values(
+                    borrow_date = borrow['borrow_date'],
+                    return_date = borrow['return_date']
+                ).where(and_(borrow_table.c.tape_id == borrow['tape_id'], borrow_table.c.user_id == borrow['user_id']))
+            self.connection.execute(update_query)
+            response = {
+                'code': 200,
+                'msg': 'Registration has been updated.'
+            }
+            return response
+        else:
+            response = {
+                'code': 400,
+                'msg': 'This registration does not exist.'
+            }
+            return response
+
+    def get_tapes_of_user(self, user_id):
+        borrow_table = self.tables.get_borrow_table()
+        tape_table = self.tables.get_tapes_table()
+        
+        select_query = select(['*']).select_from(tape_table.join(borrow_table)).where(and_(borrow_table.c.return_date == None, borrow_table.c.user_id == user_id))
+
+        result = self.connection.execute(select_query)
+
+        tapes = []
+        for res in result:
+            tape = Tape(input_tuple=res)
+            tapes.append(tape.return_as_dict())
+
+        return tapes

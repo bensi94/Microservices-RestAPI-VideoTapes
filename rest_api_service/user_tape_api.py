@@ -2,12 +2,18 @@ from flask.views import MethodView
 from nameko.standalone.rpc import ClusterRpcProxy
 from shared_utils.config import CONFIG
 from flask import Response, request
+import json
 
 class UserTapeAPI(MethodView):
 
     # Gets information about the tapes a given user has on loan
     def get(self, user_id):
-        pass
+        with ClusterRpcProxy(CONFIG) as rpc:
+            tapes = rpc.tape_service.get_tapes_of_user(user_id)
+            if tapes is not None:
+                return Response(json.dumps(tapes), mimetype='application/json')
+
+            return ('User has no tapes on loan!', 404)
 
     # Registers tape on loan
     def post(self, user_id, tape_id):

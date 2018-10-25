@@ -77,9 +77,31 @@ class Tape_service:
         with ClusterRpcProxy(CONFIG) as rpc:
             response = rpc.database_service.return_tape(return_date, user_id, tape_id)
             return response
+            
     def update_registration(self, borrow):
-        # TO DO: Validate the new dates...
+        pattern = re.compile('^[0-9]{4}-(((01|03|05|07|08|10|12)-([1-2][0-9]|3[0-1]))|((04|06|09|11)-([1-2][0-9]|30))|02-[1-2][0-9])$')
+        if borrow['return_date'] is not None:
+            if not pattern.match(borrow['return_date']):
+                response = {
+                    'code': 400,
+                    'msg': 'Invalid date format for return_date'
+                }
+                return response
+            borrow['return_date'] = datetime.strptime(borrow['return_date'], '%Y-%m-%d')
+        if not pattern.match(borrow['borrow_date']):
+            response = {
+                'code': 400,
+                'msg': 'Invalid date format for borrow_date'
+            }
+            return response
         with ClusterRpcProxy(CONFIG) as rpc:
+            borrow['borrow_date'] = datetime.strptime(borrow['borrow_date'], '%Y-%m-%d')
             response = rpc.database_service.update_registration(borrow)
             return response
+    
+    def get_tapes_of_user(self, user_id):
+        with ClusterRpcProxy(CONFIG) as rpc:
+            response = rpc.database_service.get_tapes_of_user(user_id)
+            return response
+        
 

@@ -79,6 +79,10 @@ class Database_Nameko_api:
     def update_registration(self, borrow):
         return self.db_tape_service.update_registration(borrow)
 
+    @rpc
+    def get_tapes_of_user(self, user_id):
+        return self.db_tape_service.get_tapes_of_user(user_id)
+
     #ONLY USED FOR TESTING, HANDLE WITH CARE
     @rpc
     def delete_and_populate(self):
