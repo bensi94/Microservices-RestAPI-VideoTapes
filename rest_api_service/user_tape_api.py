@@ -10,10 +10,12 @@ class UserTapeAPI(MethodView):
     def get(self, user_id):
         with ClusterRpcProxy(CONFIG) as rpc:
             tapes = rpc.tape_service.get_tapes_of_user(user_id)
-            if tapes is not None:
+            if isinstance(tapes, list):
+                if tapes == []:
+                    return ('User has no tapes on loan', 404)
                 return Response(json.dumps(tapes), mimetype='application/json')
 
-            return ('User has no tapes on loan!', 404)
+            return (tapes['msg'], tapes['code'])
 
     # Registers tape on loan
     def post(self, user_id, tape_id):
