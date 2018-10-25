@@ -1,6 +1,7 @@
 from sqlalchemy import select, insert, func, and_, update
 from shared_utils.logger import _log
 from entity_classes.tape import Tape
+from entity_classes.user import User
 from database_service.database_utils import Database_utils
 import json
 
@@ -216,3 +217,77 @@ class Database_tape_service:
             return response
     def update_registration(self, borrow):
         return 0    
+
+    def get_all_reviews(self):
+        tapes_table = self.tables.get_tapes_table()
+        review_table = self.tables.get_review_table()
+
+        get_query = select(['*']).select_from(tapes_table.join(review_table))
+        result = self.connection.execute(get_query)
+
+        results = []
+        for res in result:
+            tape = Tape(input_tuple=res)
+            return_dict = tape.return_as_dict()
+            return_dict['rating'] = res[-1]
+            results.append(return_dict)
+        return results
+
+    def get_tape_reviews(self, tape_id):
+        tapes_table = self.tables.get_tapes_table()
+        review_table = self.tables.get_review_table()
+
+        get_query = select(['*']).select_from(
+            tapes_table.join(review_table)).where(
+                tapes_table.c.id == tape_id)
+
+        result = self.connection.execute(get_query)
+
+        results = []
+        for res in result:
+            tape = Tape(input_tuple=res)
+            return_dict = tape.return_as_dict()
+            return_dict['rating'] = res[-1]
+            results.append(return_dict)
+        return results
+        
+
+    def get_review(self, tape_id, user_id):
+        users_table = self.tables.get_users_table()
+        tapes_table = self.tables.get_tapes_table()
+        review_table = self.tables.get_review_table()
+
+        user_query = select(['*']).select_from(users_table).where(
+            users_table.c.id == user_id
+        )
+
+        user_res = self.connection.execute(user_query)
+
+        user_res = user_res.fetchone()
+
+        if user_res is None:
+            return None
+        
+        user = User(input_tuple=user_res)
+
+        result_dict = user.return_as_dict()
+
+        get_query = select(['*']).select_from(
+            tapes_table.join(review_table)).where(and_(review_table.c.user_id
+             == user_id, review_table.c.tape_id == tape_id))
+        
+        result = self.connection.execute(get_query)
+        result = result.fetchone()
+
+        if result is None:
+            result_dict['Review'] = 'No review for this tape for this user'
+        else:
+            tape = Tape(input_tuple=result)
+            review_dict = tape.return_as_dict()
+            review_dict['rating'] = result[-1]
+            result_dict['Review'] = review_dict
+        _log.info(result_dict)
+        
+        return result_dict
+
+        

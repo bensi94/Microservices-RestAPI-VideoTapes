@@ -1,8 +1,8 @@
 from sqlalchemy import select, insert, func, and_, update
 from shared_utils.logger import _log
 from entity_classes.user import User
+from entity_classes.tape import Tape
 from database_service.database_utils import Database_utils
-#from database_service.db_tape_service import Database_tape_service
 import json
 
 class Database_user_service:
@@ -11,7 +11,6 @@ class Database_user_service:
         self.connection = connection
         self.tables = tables
         self.utils = Database_utils(connection)
-        #self.tape_service = Database_tape_service(connection, tables)
 
     def get_users(self):
         select_query = select([self.tables.get_users_table()])
@@ -124,3 +123,43 @@ class Database_user_service:
         else:
              self.connection.execute(review_table.delete().where(and_(
                  review_table.c.user_id == user_id, review_table.c.tape_id == tape_id)))
+
+    def get_user_reviews(self, user_id):
+        users_table = self.tables.get_users_table()
+        tapes_table = self.tables.get_tapes_table()
+        review_table = self.tables.get_review_table()
+
+        user_query = select(['*']).select_from(users_table).where(
+            users_table.c.id == user_id
+        )
+
+        user_res = self.connection.execute(user_query)
+
+        user_res = user_res.fetchone()
+
+        if user_res is None:
+            return None
+        
+        user = User(input_tuple=user_res)
+
+        result_dict = user.return_as_dict()
+        
+        get_query = select(['*']).select_from(
+            tapes_table.join(review_table)).where(review_table.c.user_id == user_id)
+
+        result = self.connection.execute(get_query)
+
+        results = []
+        for res in result:
+            tape = Tape(input_tuple=res)
+            review_dict = tape.return_as_dict()
+            review_dict['rating'] = res[-1]
+            results.append(review_dict)
+            _log.info(review_dict)
+
+        result_dict['Reviews'] = results
+
+        if len(results) == 0:
+            result_dict['Reviews'] = 'No review for this user'
+
+        return result_dict
