@@ -27,12 +27,12 @@ app.add_url_rule('/tapes/<int:tape_id>', view_func=tape_view,
 
 ### UserTapeAPI ###
 user_tape_view = UserTapeAPI.as_view('user_tape_api')
-app.add_url_rule('/users/<int:user_id>/tapes', defaults={'tape_id': None},
+app.add_url_rule('/users/<int:user_id>/tapes',
                 view_func = user_tape_view, methods=['GET', ])
 app.add_url_rule('/users/<int:user_id>/tapes/<int:tape_id>', view_func=user_tape_view, 
                 methods=['POST', ])
 app.add_url_rule('/users/<int:user_id>/tapes/<int:tape_id>', view_func=user_tape_view, 
-                methods=['GET', 'PUT', 'DELETE'])
+                methods=['PUT', 'DELETE'])
 
 ### UserReviewAPI ###
 user_review_api = UserReviewAPI.as_view('user_review_api')

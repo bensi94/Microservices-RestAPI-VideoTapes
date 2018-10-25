@@ -26,3 +26,14 @@ class Database_utils:
             return False
 
         return True
+    
+    def return_date_is_none(self, borrow_table, user_id, tape_id):
+        select_query = select([borrow_table]).where(
+            and_(borrow_table.c.tape_id == tape_id , borrow_table.c.user_id == user_id, borrow_table.c.return_date == None))
+        result = self.connection.execute(select_query)
+        result = result.fetchone()
+
+        if result == None:
+            return False
+
+        return True

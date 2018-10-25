@@ -4,8 +4,6 @@ from database_service.db_user_service import Database_user_service
 from nameko.rpc import rpc
 from shared_utils.logger import EntrypointLogger, _log
 
-
-
 class Database_Nameko_api:
     """
         Database Microservice:
@@ -80,6 +78,10 @@ class Database_Nameko_api:
         return self.db_tape_service.update_registration(borrow)
 
     @rpc
+    def get_tapes_of_user(self, user_id):
+        return self.db_tape_service.get_tapes_of_user(user_id)
+
+    @rpc
     def get_all_reviews(self):
         return self.db_tape_service.get_all_reviews()
 
@@ -94,6 +96,7 @@ class Database_Nameko_api:
     @rpc
     def get_review(self, tape_id, user_id):
         return self.db_tape_service.get_review(tape_id, user_id)
+ 
 
     #ONLY USED FOR TESTING, HANDLE WITH CARE
     @rpc
