@@ -155,7 +155,6 @@ class Database_user_service:
             review_dict = tape.return_as_dict()
             review_dict['rating'] = res[-1]
             results.append(review_dict)
-            _log.info(review_dict)
 
         result_dict['Reviews'] = results
 
@@ -172,6 +171,7 @@ class Database_user_service:
         if validation != 'valid':
             return validation
 
+        review['rating'] = int(review['rating'])
 
         if self.check_reveiew_exist(review) is not None:
             response = {

@@ -50,6 +50,10 @@ class ReviewService:
     # Checks that review is int between 1 and 10
     def validate_review(self, review):
         rating = review['rating']
+
+        if rating is None:
+            return False
+
         if rating.isdigit():
             rating = int(rating)
             if  rating > 0 and rating <= 10:
@@ -60,6 +64,4 @@ class ReviewService:
     def delete_review(self, user_id, tape_id):
         with ClusterRpcProxy(CONFIG) as rpc:
             response = rpc.database_service.delete_review(user_id, tape_id)
-            _log.info("RESPONSE: " )
-            _log.info(response)
             return response

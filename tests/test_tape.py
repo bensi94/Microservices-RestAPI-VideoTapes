@@ -10,8 +10,6 @@ from shared_utils.config import CONFIG
 def run_around_tests():
     with ClusterRpcProxy(CONFIG) as rpc:
         rpc.database_service.delete_and_populate()
-   #yield
-
 
 # Testing tape get
 def test_get_all():
