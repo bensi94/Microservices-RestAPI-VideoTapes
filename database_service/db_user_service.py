@@ -58,7 +58,7 @@ class Database_user_service:
         user_table = self.tables.get_users_table()
         if self.utils.check_if_exist(user_table, user_id) > 0:
             self.delete_borrow(user_id)
-            self.delete_review(user_id)
+            self.delete_reviews(user_id)
             self.connection.execute(user_table.delete().where(user_table.c.id == user_id))
             response = {
                 'code': 200,
@@ -113,7 +113,7 @@ class Database_user_service:
 
     # Delete users from reveiws, if tape_id is set
     # it only deletes as single review, otherwise all
-    def delete_review(self, user_id, tape_id=None):
+    def delete_reviews(self, user_id, tape_id=None):
         review_table = self.tables.get_review_table()
 
         # Delete all reviews of tape
@@ -165,6 +165,7 @@ class Database_user_service:
 
         return result_dict
 
+
     def on_loan_at(self, loan_date):
         borrow_table = self.tables.get_borrow_table()
         user_table = self.tables.get_users_table()
@@ -203,3 +204,144 @@ class Database_user_service:
             users.append(user.return_as_dict())
 
         return users
+
+    def add_review(self, review):
+        review_table = self.tables.get_review_table()
+
+        validation = self.validate_review(review)
+
+        if validation != 'valid':
+            return validation
+
+
+        if self.check_reveiew_exist(review) is not None:
+            response = {
+                'msg': 'Review already exist for this tape',
+                'code': 400
+            }
+            return response
+
+        review_id = self.connection.execute(review_table.insert(), review).inserted_primary_key[0]
+
+        review['id'] = review_id
+
+        response = {
+            'msg': json.dumps(review),
+            'code': 200
+        }
+
+        return response
+
+    def update_review(self, review):
+        tape_id = review['tape_id']
+        user_id = review['user_id']
+        review_table = self.tables.get_review_table()
+
+        validation = self.validate_review(review)
+        if validation != 'valid':
+            return validation
+
+        if self.check_reveiew_exist(review) is None:
+            response = {
+                'msg': 'Review does not exist for this tape',
+                'code': 400
+            }
+            return response
+        
+        self.connection.execute(
+            review_table.update().where(and_(review_table.c.tape_id == tape_id, 
+            review_table.c.user_id == user_id )), review)
+
+        review_id_query = select([review_table.c.id]).where(and_(
+            review_table.c.tape_id == tape_id, review_table.c.user_id == user_id
+        ))
+        review_id = self.connection.execute(review_id_query).scalar()        
+
+        review['id'] = review_id
+
+        response = {
+            'msg': json.dumps(review),
+            'code': 200
+        }
+
+        return response
+
+    def delete_review(self, user_id, tape_id):
+        review_taple = self.tables.get_review_table()
+        
+        # Just used for the check that takes in review
+        review = {
+            'user_id': user_id,
+            'tape_id': tape_id
+        }
+
+        validation = self.validate_review(review)
+        if validation != 'valid':
+            return validation
+
+        if self.check_reveiew_exist(review) is None:
+            response = {
+                'msg': 'Review does not exist for this tape',
+                'code': 400
+            }
+            return response
+
+        self.connection.execute(
+            review_taple.delete().where(and_(
+                review_taple.c.user_id == user_id, 
+                review_taple.c.tape_id == tape_id)))
+
+        response = {
+            'code': 200,
+            'msg': 'Review with user ID:' + str(user_id) + ' and tape ID:' + str(tape_id) + ' deleted'
+        }
+
+        return response
+        
+        
+
+    def check_reveiew_exist(self, review):
+        tape_id = review['tape_id']
+        user_id = review['user_id']
+        review_table = self.tables.get_review_table()
+
+        # Checks that reveiw exists in table
+        review_query = select(['*']).select_from(review_table).where(and_(
+            review_table.c.tape_id == tape_id, review_table.c.user_id == user_id
+        ))
+        review_res = self.connection.execute(review_query)
+        return review_res.fetchone()
+
+    def validate_review(self, review):
+        tape_id = review['tape_id']
+        user_id = review['user_id']
+        users_table = self.tables.get_users_table()
+        tapes_table = self.tables.get_tapes_table()
+
+        # Checks that user_id exists
+        user_query = select(['*']).select_from(users_table).where(
+            users_table.c.id == user_id
+        )
+        user_res = self.connection.execute(user_query)
+        user_res = user_res.fetchone()
+        if user_res is None:
+            response = {
+                'msg': 'User ID does not exist!',
+                'code': 404
+            }
+            return response
+
+        # Checks that tape_id exists
+        tape_query = select(['*']).select_from(tapes_table).where(
+            tapes_table.c.id == tape_id
+        )
+        tape_res = self.connection.execute(tape_query)
+        tape_res = tape_res.fetchone()
+        if tape_res is None:
+            response = {
+                'msg': 'Tape ID does not exist!',
+                'code': 404
+            }
+            return response
+        
+        return 'valid'

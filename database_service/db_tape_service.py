@@ -320,7 +320,7 @@ class Database_tape_service:
         user_res = self.connection.execute(user_query)
 
         user_res = user_res.fetchone()
-
+        
         if user_res is None:
             return None
         
