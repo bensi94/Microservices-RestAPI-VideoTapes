@@ -1,5 +1,6 @@
 from nameko.standalone.rpc import ClusterRpcProxy
 from shared_utils.config import CONFIG
+from datetime import datetime
 import re
 
 class User_service:
@@ -57,3 +58,52 @@ class User_service:
             return False, 'Invalid phone number format'
         
         return True, ''
+    
+    def on_loan_at(self, loan_date):
+        pattern = re.compile('^[0-9]{4}-(((01|03|05|07|08|10|12)-([1-2][0-9]|3[0-1]))|((04|06|09|11)-([1-2][0-9]|30))|02-[1-2][0-9])$')
+
+        if not pattern.match(loan_date):
+            response = {
+                'code': 400,
+                'msg': 'Invalid date format.'
+            }
+            return response
+        loan_date = datetime.strptime(loan_date, '%Y-%m-%d')
+        with ClusterRpcProxy(CONFIG) as rpc:
+            response = rpc.database_service.on_loan_at(loan_date)
+            return response
+    
+    def on_loan_for(self, loan_duration):
+        if not loan_duration.isdigit():
+            response = {
+                'code': 400,
+                'msg': 'The duration must be an integer'
+            }
+            return response
+        with ClusterRpcProxy(CONFIG) as rpc:
+            loan_duration = int(loan_duration)
+            response = rpc.database_service.on_loan_for(loan_duration)
+            return response
+
+    def on_loan_for_and_at(self, loan_date, loan_duration):
+        if not loan_duration.isdigit():
+            response = {
+                'code': 400,
+                'msg': 'The duration must be an integer'
+            }
+            return response
+        
+        pattern = re.compile('^[0-9]{4}-(((01|03|05|07|08|10|12)-([1-2][0-9]|3[0-1]))|((04|06|09|11)-([1-2][0-9]|30))|02-[1-2][0-9])$')
+
+        if not pattern.match(loan_date):
+            response = {
+                'code': 400,
+                'msg': 'Invalid date format.'
+            }
+            return response
+        loan_date = datetime.strptime(loan_date, '%Y-%m-%d')
+        
+        with ClusterRpcProxy(CONFIG) as rpc:
+            loan_duration = int(loan_duration)
+            response = rpc.database_service.on_loan_for_and_at(loan_date, loan_duration)
+            return response

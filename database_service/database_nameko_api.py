@@ -97,7 +97,17 @@ class Database_Nameko_api:
     def get_review(self, tape_id, user_id):
         return self.db_tape_service.get_review(tape_id, user_id)
  
+    @rpc
+    def on_loan_at(self, loan_date):
+        return self.db_user_service.on_loan_at(loan_date)
 
+    @rpc
+    def on_loan_for(self, loan_duration):
+        return self.db_user_service.on_loan_for(loan_duration)
+
+    @rpc
+    def on_loan_for_and_at(self, loan_date, loan_duration):
+        return self.db_user_service.on_loan_for_and_at(loan_date, loan_duration)
     #ONLY USED FOR TESTING, HANDLE WITH CARE
     @rpc
     def delete_and_populate(self):
