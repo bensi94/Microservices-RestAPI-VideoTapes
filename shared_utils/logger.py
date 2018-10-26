@@ -5,6 +5,7 @@ import time
 
 _log = logging.getLogger(__name__)
 
+# Simple entrypoint logger that logs every time a nameko function starts and completes execution
 class EntrypointLogger(DependencyProvider):
 
     def setup(self):

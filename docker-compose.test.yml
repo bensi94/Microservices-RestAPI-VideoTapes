@@ -35,22 +35,20 @@ services:
         SERVICE_STRING: "database_service.database_nameko_api"
         DB_CONFIG: "database_service/tests/db-config-test.json"
 
-  # recommendation_service:
-  #   build:
-  #     context: ./
-  #     dockerfile: ./recommendation_service/Dockerfile
-  #   depends_on:
-  #     - db
-  #     - rabbit
-  #   environment:
-  #       RABBIT_PASSWORD: "guest"
-  #       RABBIT_USER: "guest"
-  #       RABBIT_HOST: "rabbit"
-  #       RABBIT_PORT: "5672"
-  #       RABBIT_MANAGEMENT_PORT: "15672"
-  #       SERVICE_STRING: "recommendation_service.recommendation_nameko_api"
-  #   logging:
-  #     driver: none
+  recommendation_service:
+    build:
+      context: ./
+      dockerfile: ./recommendation_service/Dockerfile
+    depends_on:
+      - db
+      - rabbit
+    environment:
+        RABBIT_PASSWORD: "guest"
+        RABBIT_USER: "guest"
+        RABBIT_HOST: "rabbit"
+        RABBIT_PORT: "5672"
+        RABBIT_MANAGEMENT_PORT: "15672"
+        SERVICE_STRING: "recommendation_service.recommendation_nameko_api"
 
   review_service:
     build:

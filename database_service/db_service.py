@@ -19,6 +19,7 @@ class Database_service:
         with open(os.environ['DB_CONFIG'], 'r') as file:
             config = json.load(file)
 
+        # Gets the connection varibles from the config file
         user = config['POSTGRES_USER']
         db = config['POSTGRES_DB']
         password = config['POSTGRES_PASSWORD']
@@ -56,10 +57,13 @@ class Database_service:
     def delete_and_populate(self):
         trans = self.conn.begin()
 
+        # Deletes from all tables
         for table in reversed(self.meta.sorted_tables):
             delete_string = table.delete()
             _log.info(delete_string)
             self.conn.execute(delete_string)
+        
+        # Resets the counting sequence
         self.conn.execute('ALTER SEQUENCE users_id_seq RESTART WITH 1')
         self.conn.execute('ALTER SEQUENCE tapes_id_seq RESTART WITH 1')
         self.conn.execute('ALTER SEQUENCE borrows_id_seq RESTART WITH 1')

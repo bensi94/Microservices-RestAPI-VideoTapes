@@ -160,7 +160,6 @@ class Database_tape_service:
         tape_table = self.tables.get_tapes_table()
         user_table = self.tables.get_tapes_table()
         borrow_table = self.tables.get_borrow_table()
-        new_id = self.utils.get_max_id(borrow_table)
 
         # Checking if user_id and tape_id both exist
         if self.utils.check_if_borrow_exists(borrow_table, borrow['user_id'], borrow['tape_id']):
@@ -184,16 +183,15 @@ class Database_tape_service:
 
         else: 
             insert_query = insert(borrow_table).values(
-                id=new_id,
                 tape_id=borrow['tape_id'],
                 user_id=borrow['user_id'],
                 borrow_date = borrow['borrow_date'],
                 return_date = None
             )
 
-            self.connection.execute(insert_query)
+            result = self.connection.execute(insert_query)
 
-            borrow['id'] = new_id
+            borrow['id'] = result.inserted_primary_key[0]
             
             response = {
                 'code': 200,
@@ -201,6 +199,7 @@ class Database_tape_service:
             }
             return response
 
+    # Changes return datae from null to the given return_date
     def return_tape(self, return_date, user_id, tape_id):
         borrow_table = self.tables.get_borrow_table()
 
@@ -229,6 +228,7 @@ class Database_tape_service:
 
             return response
 
+    # Changes return and borrow dates of tape
     def update_registration(self, borrow):
         borrow_table = self.tables.get_borrow_table()
         if self.utils.check_if_borrow_exists(borrow_table, borrow['user_id'], borrow['tape_id']):
@@ -267,6 +267,8 @@ class Database_tape_service:
             and_(borrow_table.c.return_date == None, borrow_table.c.user_id == user_id))
 
         result = self.connection.execute(select_query)
+
+        # Returns all the tapes from the sql result
         tapes = []
         for res in result:
             tape = Tape(input_tuple=res)
@@ -281,6 +283,7 @@ class Database_tape_service:
         get_query = select(['*']).select_from(tapes_table.join(review_table))
         result = self.connection.execute(get_query)
 
+        # Returns all the tapes from the sql result
         results = []
         for res in result:
             tape = Tape(input_tuple=res)
@@ -299,6 +302,7 @@ class Database_tape_service:
 
         result = self.connection.execute(get_query)
 
+        # Returns all the tapes from the sql result
         results = []
         for res in result:
             tape = Tape(input_tuple=res)
@@ -335,6 +339,7 @@ class Database_tape_service:
         result = self.connection.execute(get_query)
         result = result.fetchone()
 
+        # Returns all the tapes from the sql result
         if result is None:
             result_dict['Review'] = 'No review for this tape for this user'
         else:
@@ -342,8 +347,6 @@ class Database_tape_service:
             review_dict = tape.return_as_dict()
             review_dict['rating'] = result[-1]
             result_dict['Review'] = review_dict
-        _log.info(result_dict)
-        
         return result_dict
 
         

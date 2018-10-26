@@ -3,7 +3,8 @@ from shared_utils.config import CONFIG
 from shared_utils.logger import EntrypointLogger, _log
 
 class ReviewService:
-
+    "Validates and makes requests to the database"
+   
     def get_all_reviews(self):
         with ClusterRpcProxy(CONFIG) as rpc:
             return rpc.database_service.get_all_reviews()

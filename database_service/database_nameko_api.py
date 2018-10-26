@@ -119,6 +119,10 @@ class Database_Nameko_api:
     @rpc
     def on_loan_for_and_at(self, loan_date, loan_duration):
         return self.db_user_service.on_loan_for_and_at(loan_date, loan_duration)
+    @rpc
+    def get_recommendation(self, user_id):
+        return self.db_user_service.get_recommendation(user_id)
+    
     #ONLY USED FOR TESTING, HANDLE WITH CARE
     @rpc
     def delete_and_populate(self):

@@ -13,6 +13,7 @@ class Database_user_service:
         self.tables = tables
         self.utils = Database_utils(connection)
 
+    # Makes select all query from users and returns them
     def get_users(self):
         select_query = select([self.tables.get_users_table()])
         result = self.connection.execute(select_query)
@@ -24,6 +25,7 @@ class Database_user_service:
 
         return users
 
+    # Makes spesific user query to the  users table and return the user
     def get_user(self, user_id):
         user_table = self.tables.get_users_table()
         select_query = select([user_table]).where(user_table.c.id == user_id)
@@ -237,6 +239,8 @@ class Database_user_service:
         user_id = review['user_id']
         review_table = self.tables.get_review_table()
 
+        _log.info(review)
+
         validation = self.validate_review(review)
         if validation != 'valid':
             return validation
@@ -315,29 +319,15 @@ class Database_user_service:
     def validate_review(self, review):
         tape_id = review['tape_id']
         user_id = review['user_id']
-        users_table = self.tables.get_users_table()
-        tapes_table = self.tables.get_tapes_table()
 
-        # Checks that user_id exists
-        user_query = select(['*']).select_from(users_table).where(
-            users_table.c.id == user_id
-        )
-        user_res = self.connection.execute(user_query)
-        user_res = user_res.fetchone()
-        if user_res is None:
+        if not self.check_user_exists(user_id):
             response = {
                 'msg': 'User ID does not exist!',
                 'code': 404
             }
             return response
 
-        # Checks that tape_id exists
-        tape_query = select(['*']).select_from(tapes_table).where(
-            tapes_table.c.id == tape_id
-        )
-        tape_res = self.connection.execute(tape_query)
-        tape_res = tape_res.fetchone()
-        if tape_res is None:
+        if not self.check_tape_exists(tape_id):
             response = {
                 'msg': 'Tape ID does not exist!',
                 'code': 404
@@ -345,3 +335,62 @@ class Database_user_service:
             return response
         
         return 'valid'
+        
+
+    def check_user_exists(self, user_id):
+        users_table = self.tables.get_users_table()
+        user_query = select(['*']).select_from(users_table).where(
+            users_table.c.id == user_id
+        )
+        user_res = self.connection.execute(user_query)
+        user_res = user_res.fetchone()
+
+        if user_res is None:
+            return False
+        return True
+
+    def check_tape_exists(self, tape_id):
+        tapes_table = self.tables.get_tapes_table()
+        tape_query = select(['*']).select_from(tapes_table).where(
+            tapes_table.c.id == tape_id
+        )
+        tape_res = self.connection.execute(tape_query)
+        tape_res = tape_res.fetchone()
+
+        if tape_res is None:
+            return False
+        return True
+
+
+    def get_recommendation(self, user_id):
+        if not self.check_user_exists(user_id):
+            response = {
+                'msg': 'User ID does not exist!',
+                'code': 404
+            }
+            return response
+        
+        # Complex sql query where clean sql is better then sqlalchemy
+        query_result = self.connection.execute(
+            'SELECT * FROM tapes ' +
+            'LEFT JOIN (SELECT reviews.tape_id, avg(reviews.rating) FROM reviews ' +
+            'GROUP BY reviews.tape_id) AS AVG_REVIEW ' +
+            'ON tapes.id = AVG_REVIEW.tape_id ' +
+            'WHERE tapes.id NOT IN ( ' +
+            'SELECT borrows.tape_id FROM borrows ' +
+            'WHERE borrows.user_id =' + str(user_id) + ') ' +
+            'ORDER BY CASE WHEN AVG_REVIEW.avg IS NULL THEN 0 END DESC ' +
+            'LIMIT 10'
+        )
+
+        results = []
+        for res in query_result:
+            tape = Tape(input_tuple=res)
+            result = tape.return_as_dict()
+            result['avg rating'] = res[-1]
+            results.append(result)
+
+        return results
+
+
+    

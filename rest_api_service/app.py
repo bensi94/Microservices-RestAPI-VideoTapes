@@ -6,6 +6,10 @@ from tape_api import TapeAPI
 from user_tape_api import UserTapeAPI
 from user_review_api import UserReviewAPI
 from tape_review_api import TapeReviewAPI
+from recommendation_api import RecommendationAPI
+
+# This is where the flask rest api is started and the routes determined
+# Then the flask api classes handle all requests to the given routes
 
 app = Flask(__name__)
 
@@ -53,7 +57,9 @@ app.add_url_rule('/tapes/<int:tape_id>/reviews/<int:user_id>', view_func=tape_re
                  methods=['GET', 'PUT', 'DELETE'])
 
 ### RecommendationAPI ###
-
+recommendation_api = RecommendationAPI.as_view('recommendation_api')
+app.add_url_rule('/users/<int:user_id>/recommendation',
+                 view_func=recommendation_api, methods=['GET', ])
 
 
 @app.route("/")
@@ -61,6 +67,7 @@ def index():
     return ('Hello world!')
 
 
+# Run flask application here
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, debug=True)
 

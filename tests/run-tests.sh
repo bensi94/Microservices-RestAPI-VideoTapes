@@ -21,4 +21,4 @@ done
 
 # Run Service
 
-py.test --disable-pytest-warnings -v  -s ./test_reviews.py
+py.test --disable-pytest-warnings -v  -s ./test_user_tape.py

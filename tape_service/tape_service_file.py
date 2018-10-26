@@ -47,7 +47,7 @@ class Tape_service:
             }
         return response
 
-
+    # Validets the title, date, and eidr is of correct type
     def validate_tape(self, tape):
         if tape['title'] is None:
             return False, 'Title is required'
