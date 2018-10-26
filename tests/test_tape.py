@@ -263,7 +263,47 @@ def test_delete_valid():
     assert get_resp.status_code == 404
     assert get_resp.text == 'Tape not found!'
 
-def test_delete_all_users():
+def test_report_loan_date():
+    "Gets all tapes that were on loan at a certain date"
+    print("TESTING GET URL: /tapes?loan_date=2017-10-10")
+
+    url = 'http://rest_api_service/tapes?loan_date=2017-10-10'
+    resp = requests.get(url)
+
+    assert resp.status_code == 200
+    assert len(resp.json()) == 11
+
+def test_report_loan_duration_900():
+    "Gets all tapes that have been on loan for a certain duration"
+    print("TESTING GET URL: /tapes?loan_duration=900")
+
+    url = 'http://rest_api_service/tapes?loan_duration=900'
+    resp = requests.get(url)
+
+    assert resp.status_code == 200
+    assert len(resp.json()) == 4
+
+def test_report_loan_duration_30():
+    "Gets all tapes that have been on loan for a certain duration"
+    print("TESTING GET URL: /tapes?loan_duration=30")
+
+    url = 'http://rest_api_service/tapes?loan_duration=30'
+    resp = requests.get(url)
+
+    assert resp.status_code == 200
+    assert len(resp.json()) == 12
+
+def test_report_loan_date_duration():
+    "Gets all tapes that were on loan for a certain duration at a certain date"
+    print("TESTING GET URL: /tapes?loan_duration=30&loan_date=2018-10-01")
+
+    url = 'http://rest_api_service/tapes?loan_duration=30&loan_date=2018-10-01'
+    resp = requests.get(url)
+
+    assert resp.status_code == 200
+    assert len(resp.json()) == 14
+
+def test_delete_all_tapes():
     "Tests deleteing all tapes from the database"
     print("TESTING Delete ALL TAPES")
 

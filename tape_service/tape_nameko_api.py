@@ -43,3 +43,15 @@ class Tape_Nameko_api:
     @rpc
     def get_tapes_of_user(self, user_id):
         return self.tape_service.get_tapes_of_user(user_id)
+    
+    @rpc
+    def on_loan_at(self, loan_date):
+        return self.tape_service.on_loan_at(loan_date)
+    
+    @rpc
+    def on_loan_for(self, loan_duration):
+        return self.tape_service.on_loan_for(loan_duration)
+    
+    @rpc
+    def on_loan_for_and_at(self, loan_date, loan_duration):
+        return self.tape_service.on_loan_for_and_at(loan_date, loan_duration) 

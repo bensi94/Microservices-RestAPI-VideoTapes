@@ -9,6 +9,39 @@ class TapeAPI(MethodView):
     # Returns list of tapes if tape_id is none
     # But spesific tape by id if tape is not None
     def get(self, tape_id):
+        
+        
+        loan_date = request.args.get('loan_date')
+        loan_duration = request.args.get('loan_duration')
+        if loan_date is not None and loan_duration is not None:
+            with ClusterRpcProxy(CONFIG) as rpc:
+                on_loan = rpc.tape_service.on_loan_for_and_at(loan_date, loan_duration)
+                if isinstance(on_loan, list):
+                    if on_loan == []:
+                        return ('No tapes were on loan that date', 200)
+                    return Response(json.dumps(on_loan), mimetype='application/json')
+                return(on_loan['msg'], on_loan['code'])
+        
+        if loan_date is not None:
+            with ClusterRpcProxy(CONFIG) as rpc:
+                on_loan = rpc.tape_service.on_loan_at(loan_date)
+                if isinstance(on_loan, list):
+                    if on_loan == []:
+                        return ('No tapes were on loan that date', 200)
+                    return Response(json.dumps(on_loan), mimetype='application/json')
+                return(on_loan['msg'], on_loan['code'])
+        
+        if loan_duration is not None:
+            with ClusterRpcProxy(CONFIG) as rpc:
+                response = rpc.tape_service.on_loan_for(loan_duration)
+                if isinstance(response, list):
+                    if response == []:
+                        return ('No tapes have been on loan for that duration', 200)
+                    return Response(json.dumps(response), mimetype='application/json')
+                return(response['msg'], response['code'])
+
+
+        
         with ClusterRpcProxy(CONFIG) as rpc:
             if tape_id is None:
                 tapes = rpc.tape_service.get_tapes()

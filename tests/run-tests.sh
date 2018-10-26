@@ -21,4 +21,8 @@ done
 
 # Run Service
 
+<<<<<<< HEAD
 py.test --disable-pytest-warnings -v  -s ./
+=======
+py.test --disable-pytest-warnings -v  -s ./test_tape.py
+>>>>>>> 32aa3400ca45068ad7a3dbdb5a9b8f91303bb19a
