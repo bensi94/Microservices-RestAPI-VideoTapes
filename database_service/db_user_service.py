@@ -1,8 +1,9 @@
-from sqlalchemy import select, insert, func, and_, update
+from sqlalchemy import select, insert, func, and_, update, or_
 from shared_utils.logger import _log
 from entity_classes.user import User
 from entity_classes.tape import Tape
 from database_service.database_utils import Database_utils
+from datetime import datetime, date
 import json
 
 class Database_user_service:
@@ -163,6 +164,46 @@ class Database_user_service:
 
         return result_dict
 
+
+    def on_loan_at(self, loan_date):
+        borrow_table = self.tables.get_borrow_table()
+        user_table = self.tables.get_users_table()
+
+        select_query = select(['*']).select_from(user_table.join(borrow_table)).where(
+            and_(borrow_table.c.borrow_date <= loan_date, or_(borrow_table.c.return_date > loan_date, borrow_table.c.return_date == None)))
+        
+        loan_res = self.connection.execute(select_query)
+
+        users = []
+        for res in loan_res:
+            user = User(input_tuple=res)
+            users.append(user.return_as_dict())
+
+        return users
+    
+    def on_loan_for(self, loan_duration):
+        today = datetime.today().strftime('%Y-%m-%d')
+        dur_res = self.connection.execute('SELECT * FROM users JOIN borrows ON users.id = borrows.user_id WHERE borrows.return_date IS NULL AND (borrows.borrow_date + \' '+ str(loan_duration) + ' day\'::interval) < \'' + str(today) +'\'')
+
+        users = []
+        for res in dur_res:
+            user = User(input_tuple=res)
+            users.append(user.return_as_dict())
+
+        return users
+    
+    def on_loan_for_and_at(self, loan_date, loan_duration):
+        query = 'SELECT * FROM users JOIN borrows ON users.id = borrows.user_id WHERE (borrows.borrow_date + \''+ str(loan_duration) + 'day\'::interval) < \''+ str(loan_date)+'\'AND (borrows.return_date > \''+str(loan_date)+'\' OR borrows.return_date IS NULL)'
+        _log.info(query)
+        loan_res = self.connection.execute(query)
+
+        users = []
+        for res in loan_res:
+            user = User(input_tuple=res)
+            users.append(user.return_as_dict())
+
+        return users
+
     def add_review(self, review):
         review_table = self.tables.get_review_table()
 
@@ -304,4 +345,3 @@ class Database_user_service:
             return response
         
         return 'valid'
-
