@@ -163,6 +163,12 @@ class Database_tape_service:
         new_id = self.utils.get_max_id(borrow_table)
 
         # Checking if user_id and tape_id both exist
+        if self.utils.check_if_borrow_exists(borrow_table, borrow['user_id'], borrow['tape_id']):
+            response = {
+                'code': 400,
+                'msg': 'This user already has this tape or loan or has rented it before.'
+            }
+            return response
         if not self.utils.check_if_exist(tape_table, borrow['tape_id']):
             response = {
                 'code': 400,
@@ -246,12 +252,21 @@ class Database_tape_service:
     def get_tapes_of_user(self, user_id):
         borrow_table = self.tables.get_borrow_table()
         tape_table = self.tables.get_tapes_table()
+        user_table = self.tables.get_users_table()
 
+        select_user = select([user_table]).where(user_table.c.id == user_id)
+        user_result = self.connection.execute(select_user)
+        user_result = user_result.fetchone()
+        if user_result == None:
+            response = {
+                'code': 400,
+                'msg': 'There is no user with this ID.'
+            }
+            return response
         select_query = select(['*']).select_from(tape_table.join(borrow_table)).where(
             and_(borrow_table.c.return_date == None, borrow_table.c.user_id == user_id))
 
         result = self.connection.execute(select_query)
-
         tapes = []
         for res in result:
             tape = Tape(input_tuple=res)
