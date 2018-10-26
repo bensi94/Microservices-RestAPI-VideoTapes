@@ -166,4 +166,5 @@ After the server is up and ready the tests can be run with:
 
 Note: Before each test everything is deleted from the database and the database re-initialized.
 
-## What we l
+## Conclusion
+Microservices are a powerful option for bigger applications and great for scalability. But they are much more complex than monolithic applications and require a lot more configuration and complex communication patterns. in practice we would not recommend the usage of microservices for a small rest api such as this one but it has been a great learning experience.
