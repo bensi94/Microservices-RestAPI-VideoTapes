@@ -119,6 +119,19 @@ class Database_Nameko_api:
     @rpc
     def on_loan_for_and_at(self, loan_date, loan_duration):
         return self.db_user_service.on_loan_for_and_at(loan_date, loan_duration)
+    
+    @rpc
+    def on_loan_at_tapes(self, loan_date):
+        return self.db_tape_service.on_loan_at(loan_date)
+
+    @rpc
+    def on_loan_for_tapes(self, loan_duration):
+        return self.db_tape_service.on_loan_for(loan_duration)
+    
+    @rpc
+    def on_loan_for_and_at_tapes(self, loan_date, loan_duration):
+        return self.db_tape_service.on_loan_for_and_at(loan_date, loan_duration)
+    
     #ONLY USED FOR TESTING, HANDLE WITH CARE
     @rpc
     def delete_and_populate(self):

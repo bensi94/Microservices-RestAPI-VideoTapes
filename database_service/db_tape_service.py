@@ -1,7 +1,8 @@
-from sqlalchemy import select, insert, func, and_, update
+from sqlalchemy import select, insert, func, and_, update, or_
 from shared_utils.logger import _log
 from entity_classes.tape import Tape
 from entity_classes.user import User
+from datetime import datetime, date
 from database_service.database_utils import Database_utils
 import json
 
@@ -69,7 +70,7 @@ class Database_tape_service:
             }
         return response
 
-    # Deletes user by id
+    # Deletes tape by id
     def delete_tape(self, tape_id):
         tape_table = self.tables.get_tapes_table()
 
@@ -345,5 +346,44 @@ class Database_tape_service:
         _log.info(result_dict)
         
         return result_dict
+
+    def on_loan_at(self, loan_date):
+        borrow_table = self.tables.get_borrow_table()
+        tape_table = self.tables.get_tapes_table()
+
+        select_query = select(['*']).select_from(tape_table.join(borrow_table)).where(
+            and_(borrow_table.c.borrow_date <= loan_date, or_(borrow_table.c.return_date > loan_date, borrow_table.c.return_date == None)))
+        
+        loan_res = self.connection.execute(select_query)
+
+        tapes = []
+        for res in loan_res:
+            tape = Tape(input_tuple=res)
+            tapes.append(tape.return_as_dict())
+        tapes = [dict(t) for t in {tuple(d.items()) for d in tapes}]
+        return tapes
+    
+    def on_loan_for(self, loan_duration):
+        today = datetime.today().strftime('%Y-%m-%d')
+        dur_res = self.connection.execute('SELECT * FROM tapes JOIN borrows ON tapes.id = borrows.tape_id WHERE borrows.return_date IS NULL AND (borrows.borrow_date + \' '+ str(loan_duration) + ' day\'::interval) < \'' + str(today) +'\'')
+
+        tapes = []
+        for res in dur_res:
+            tape = Tape(input_tuple=res)
+            tapes.append(tape.return_as_dict())
+        tapes = [dict(t) for t in {tuple(d.items()) for d in tapes}]
+        return tapes
+    
+    def on_loan_for_and_at(self, loan_date, loan_duration):
+        query = 'SELECT * FROM tapes JOIN borrows ON tapes.id = borrows.tape_id WHERE (borrows.borrow_date + \''+ str(loan_duration) + 'day\'::interval) < \''+ str(loan_date)+'\'AND (borrows.return_date > \''+str(loan_date)+'\' OR borrows.return_date IS NULL)'
+        _log.info(query)
+        loan_res = self.connection.execute(query)
+
+        tapes = []
+        for res in loan_res:
+            tape = Tape(input_tuple=res)
+            tapes.append(tape.return_as_dict())
+        tapes = [dict(t) for t in {tuple(d.items()) for d in tapes}]
+        return tapes
 
         

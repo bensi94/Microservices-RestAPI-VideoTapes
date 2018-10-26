@@ -53,7 +53,7 @@ class Tape_service:
             return False, 'Title is required'
         
         if tape['release_date'] is not None:
-            pattern = re.compile('^[0-9]{4}-(((01|03|05|07|08|10|12)-([1-2][0-9]|3[0-1]))|((04|06|09|11)-([1-2][0-9]|30))|02-[1-2][0-9])$')
+            pattern = re.compile('^\d{4}[\-\/\s]?((((0[13578])|(1[02]))[\-\/\s]?(([0-2][0-9])|(3[01])))|(((0[469])|(11))[\-\/\s]?(([0-2][0-9])|(30)))|(02[\-\/\s]?[0-2][0-9]))$')
 
             if not pattern.match(tape['release_date']):
                 return False, 'Invalid date'
@@ -78,7 +78,7 @@ class Tape_service:
             return response
             
     def update_registration(self, borrow):
-        pattern = re.compile('^[0-9]{4}-(((01|03|05|07|08|10|12)-([1-2][0-9]|3[0-1]))|((04|06|09|11)-([1-2][0-9]|30))|02-[1-2][0-9])$')
+        pattern = re.compile('^\d{4}[\-\/\s]?((((0[13578])|(1[02]))[\-\/\s]?(([0-2][0-9])|(3[01])))|(((0[469])|(11))[\-\/\s]?(([0-2][0-9])|(30)))|(02[\-\/\s]?[0-2][0-9]))$')
         if borrow['return_date'] is not None:
             if not pattern.match(borrow['return_date']):
                 response = {
@@ -104,3 +104,51 @@ class Tape_service:
             return response
         
 
+    def on_loan_at(self, loan_date):
+        pattern = re.compile('^\d{4}[\-\/\s]?((((0[13578])|(1[02]))[\-\/\s]?(([0-2][0-9])|(3[01])))|(((0[469])|(11))[\-\/\s]?(([0-2][0-9])|(30)))|(02[\-\/\s]?[0-2][0-9]))$')
+
+        if not pattern.match(loan_date):
+            response = {
+                'code': 400,
+                'msg': 'Invalid date format.'
+            }
+            return response
+        loan_date = datetime.strptime(loan_date, '%Y-%m-%d')
+        with ClusterRpcProxy(CONFIG) as rpc:
+            response = rpc.database_service.on_loan_at_tapes(loan_date)
+            return response
+    
+    def on_loan_for(self, loan_duration):
+        if not loan_duration.isdigit():
+            response = {
+                'code': 400,
+                'msg': 'The duration must be an integer'
+            }
+            return response
+        with ClusterRpcProxy(CONFIG) as rpc:
+            loan_duration = int(loan_duration)
+            response = rpc.database_service.on_loan_for_tapes(loan_duration)
+            return response
+
+    def on_loan_for_and_at(self, loan_date, loan_duration):
+        if not loan_duration.isdigit():
+            response = {
+                'code': 400,
+                'msg': 'The duration must be an integer'
+            }
+            return response
+        
+        pattern = re.compile('^\d{4}[\-\/\s]?((((0[13578])|(1[02]))[\-\/\s]?(([0-2][0-9])|(3[01])))|(((0[469])|(11))[\-\/\s]?(([0-2][0-9])|(30)))|(02[\-\/\s]?[0-2][0-9]))$')
+
+        if not pattern.match(loan_date):
+            response = {
+                'code': 400,
+                'msg': 'Invalid date format.'
+            }
+            return response
+        loan_date = datetime.strptime(loan_date, '%Y-%m-%d')
+        
+        with ClusterRpcProxy(CONFIG) as rpc:
+            loan_duration = int(loan_duration)
+            response = rpc.database_service.on_loan_for_and_at_tapes(loan_date, loan_duration)
+            return response

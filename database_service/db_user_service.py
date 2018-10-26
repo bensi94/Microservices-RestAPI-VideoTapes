@@ -178,7 +178,7 @@ class Database_user_service:
         for res in loan_res:
             user = User(input_tuple=res)
             users.append(user.return_as_dict())
-
+        users = [dict(t) for t in {tuple(d.items()) for d in users}]
         return users
     
     def on_loan_for(self, loan_duration):
@@ -189,7 +189,7 @@ class Database_user_service:
         for res in dur_res:
             user = User(input_tuple=res)
             users.append(user.return_as_dict())
-
+        users = [dict(t) for t in {tuple(d.items()) for d in users}]
         return users
     
     def on_loan_for_and_at(self, loan_date, loan_duration):
@@ -201,7 +201,7 @@ class Database_user_service:
         for res in loan_res:
             user = User(input_tuple=res)
             users.append(user.return_as_dict())
-
+        users = [dict(t) for t in {tuple(d.items()) for d in users}]
         return users
 
     def add_review(self, review):
