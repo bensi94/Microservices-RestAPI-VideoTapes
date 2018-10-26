@@ -1,4 +1,5 @@
 # Project 2, Videotapes Galore, a Rest API
+**Authors:** Benedikt Óskarsson and Benedikt Þorri Þórarinsson
 
 ## Project design
 
@@ -164,3 +165,5 @@ After the server is up and ready the tests can be run with:
 ```
 
 Note: Before each test everything is deleted from the database and the database re-initialized.
+
+## What we l
