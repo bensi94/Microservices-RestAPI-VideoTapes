@@ -25,10 +25,17 @@ class TapeReviewAPI(MethodView):
 
     #  Deletes review by user and tape ID
     def delete(self, tape_id, user_id):
-        # TO DO: delete review
-        pass
+        with ClusterRpcProxy(CONFIG) as rpc:
+            response = rpc.review_service.delete_review(user_id, tape_id)
+            return(response['msg'], response['code'])
 
     # Updates reveiw by user and tape ID
     def put(self, tape_id, user_id):
-        # TO DO: update review
-        pass
+        review = {
+            "rating": request.args.get('rating'),
+            "user_id": user_id,
+            "tape_id": tape_id
+        }
+        with ClusterRpcProxy(CONFIG) as rpc:
+            response = rpc.review_service.update_review(review)
+            return(response['msg'], response['code'])

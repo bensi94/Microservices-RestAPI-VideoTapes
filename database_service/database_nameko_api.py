@@ -96,7 +96,18 @@ class Database_Nameko_api:
     @rpc
     def get_review(self, tape_id, user_id):
         return self.db_tape_service.get_review(tape_id, user_id)
- 
+    
+    @rpc
+    def add_review(self, review):
+        return self.db_user_service.add_review(review)
+    
+    @rpc
+    def update_review(self, review):
+        return self.db_user_service.update_review(review)
+    
+    @rpc
+    def delete_review(self, user_id, tape_id):
+        return self.db_user_service.delete_review(user_id, tape_id)
 
     #ONLY USED FOR TESTING, HANDLE WITH CARE
     @rpc

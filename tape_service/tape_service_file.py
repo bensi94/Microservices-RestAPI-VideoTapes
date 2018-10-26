@@ -27,7 +27,6 @@ class Tape_service:
                 'msg': msg
             }
 
-
         return response
 
     def delete_tape(self, tape_id):

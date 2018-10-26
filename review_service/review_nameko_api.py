@@ -24,4 +24,14 @@ class Review_Nameko_api:
     def get_review(self, tape_id, user_id):
         return self.review_service.get_review(tape_id, user_id)
 
+    @rpc
+    def add_review(self, review):
+        return self.review_service.add_review(review)
+    
+    @rpc
+    def update_review(self, review):
+        return self.review_service.update_review(review)
 
+    @rpc 
+    def delete_review(self, user_id, tape_id):
+        return self.review_service.delete_review(user_id, tape_id)
