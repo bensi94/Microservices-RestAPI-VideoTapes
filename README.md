@@ -60,7 +60,12 @@ After installing docker the project can be run with this command:
  docker-compose build && docker-compose up
 ```
 
-When all services have been started and the Application is ready to process requests it can be used with *Postman, Curl or other http request application*.
+When all services have been started and the Application is ready to process requests it can be used with *Postman, Curl or other http request application*.  
+
+The application can be shut down with CTRL-C. After shuting down the applications it's necessary to run this command:
+```console
+ docker-compose down
+```
 
 **Problems:**  
 If you encounter any problems with docker containers or database, docker can be reset with and then the project started again:
@@ -163,8 +168,12 @@ After the server is up and ready the tests can be run with:
 ```console
  docker-compose -f docker-compose.testrunner.yml  build && docker-compose -f docker-compose.testrunner.yml  up
 ```
-
 Note: Before each test everything is deleted from the database and the database re-initialized.
+
+After running the tests the server can be shut down with CTRL-C. After shuting down  it's necessary to run this command:
+```console
+ docker-compose down
+```
 
 ## Conclusion
 Microservices are a powerful option for bigger applications and great for scalability. But they are much more complex than monolithic applications and require a lot more configuration and complex communication patterns. in practice we would not recommend the usage of microservices for a small rest api such as this one but it has been a great learning experience.
