@@ -1,5 +1,7 @@
-# Project 2, Videotapes Galore, a Rest API
+# Microservices Rest API - Videotapes
+*Project in Software Design and Implementation at Reykjavik University*
 **Authors:** Benedikt Óskarsson and Benedikt Þorri Þórarinsson
+
 
 ## Project design
 
